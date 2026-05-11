@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CET-4 备战</title>
+
+    <!-- PWA: iOS 全屏模式 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CET-4">
+    <link rel="apple-touch-icon" href="icon.svg">
+
+    <!-- PWA: Android / 通用 -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --glass-card-bg: rgba(255, 255, 255, 0.35);
+            --glass-card-blur: 12px;
+            --glass-border-color: rgba(255, 255, 255, 0.4);
+            --primary-text-color: #222222;
+            --secondary-text-color: #555555;
+            --icon-color: #333333;
+            --highlight-color: #ffffff;
+            --bg-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+        body {
+            background-image: var(--bg-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: #d4e8f5;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px 15px 120px;
+            margin: 0 auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex: 1;
+            scrollbar-width: none;
+        }
+        .app-container::-webkit-scrollbar { display: none; }
+
+        .glass-card {
+            background: var(--glass-card-bg);
+            backdrop-filter: blur(var(--glass-card-blur));
+            -webkit-backdrop-filter: blur(var(--glass-card-blur));
+            border: 1px solid var(--glass-border-color);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            color: var(--primary-text-color);
+        }
+
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: var(--primary-text-color);
+        }
+        .header-title h1 { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
+        .header-title .sub { margin-top: 4px; font-size: 13px; opacity: 0.8; display: flex; align-items: center; gap: 5px; }
+        .header-title .sub span { background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,0.2); }
+
+        .settings-btn {
+            width: 36px; height: 36px;
+            background: var(--glass-card-bg);
+            backdrop-filter: blur(5px);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--glass-border-color);
+            cursor: pointer;
+            color: var(--icon-color);
+            transition: all 0.2s;
+        }
+        .settings-btn:hover { background: rgba(255,255,255,0.6); }
+
+        .progress-card {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .progress-top { display: flex; justify-content: space-between; align-items: center; }
+        .circle-progress-container {
+            display: flex; align-items: center; gap: 15px;
+        }
+        .circle-chart {
+            width: 80px; height: 80px;
+            position: relative;
+        }
+        .circle-chart svg {
+            transform: rotate(-90deg);
+        }
+        .circle-chart circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .circle-bg { stroke: rgba(255, 255, 255, 0.3); }
+        .circle-progress { stroke: #ffffff; stroke-dasharray: 226; stroke-dashoffset: 90; transition: stroke-dashoffset 0.5s; }
+
+        .circle-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .circle-text small { display: block; font-size: 10px; font-weight: normal; opacity: 0.8; }
+
+        .today-study { flex: 1; }
+        .today-study h3 { font-size: 16px; margin-bottom: 4px; }
+        .today-study .sub-today { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
+        .progress-bar-track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #ffffff; width: 60%; transition: width 0.5s; }
+
+        .continue-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--primary-text-color);
+            backdrop-filter: blur(4px);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .continue-btn:hover { background: rgba(255,255,255,0.4); }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--glass-border-color);
+        }
+        .stat-item h4 { font-size: 16px; font-weight: bold; }
+        .stat-item p { font-size: 10px; opacity: 0.7; }
+
+        .grid-2x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .func-item {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border-color);
+            border-radius: 16px;
+            padding: 16px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--primary-text-color);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .func-item i { font-size: 24px; color: var(--icon-color); transition: all 0.2s ease; }
+        .func-item span { font-size: 14px; font-weight: 600; opacity: 0.9; }
+
+        .func-item:active {
+            transform: scale(0.95);
+        }
+        .func-item.active {
+            background: rgba(111, 192, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(111, 192, 255, 0.6);
+            box-shadow: 0 0 20px rgba(111, 192, 255, 0.1);
+        }
+        .func-item.active i {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(111, 192, 255, 0.5);
+        }
+
+        .plan-card-header, .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .plan-card-header h3, .task-card-header h3 { font-size: 16px; font-weight: bold; }
+        .view-all { font-size: 12px; opacity: 0.7; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+        .plan-content { display: flex; gap: 12px; align-items: center; }
+        .plan-icon-box {
+            width: 48px; height: 48px; background: rgba(0,0,0,0.1); border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.2; color: var(--primary-text-color);
+            flex-shrink: 0;
+            backdrop-filter: blur(2px);
+        }
+        .plan-info { flex: 1; }
+        .plan-title { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+        .plan-date { font-size: 11px; opacity: 0.7; margin-bottom: 6px; }
+        .plan-progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .plan-progress-fill { height: 100%; background: #ffffff; width: 60%; transition: width 0.5s; }
+        .plan-percent { font-size: 12px; opacity: 0.7; width: 30px; text-align: right; }
+
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid var(--glass-border-color);
+            backdrop-filter: blur(4px);
+        }
+        .task-icon { color: var(--icon-color); width: 18px; text-align: center; }
+        .task-text { flex: 1; font-size: 13px; }
+        .task-progress { font-size: 12px; opacity: 0.7; }
+
+        .bottom-nav-wrapper {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 999;
+            pointer-events: none;
+        }
+        .bottom-nav {
+            pointer-events: auto;
+            width: 85%;
+            max-width: 400px;
+            background: var(--glass-card-bg);
+            backdrop-filter: blur(var(--glass-card-blur));
+            -webkit-backdrop-filter: blur(var(--glass-card-blur));
+            border: 1px solid var(--glass-border-color);
+            border-radius: 30px;
+            padding: 10px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .nav-btn {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            color: var(--primary-text-color);
+            font-size: 18px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-btn i { color: var(--icon-color); }
+        .nav-btn.middle {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid var(--glass-border-color);
+            font-size: 22px;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.5); }
+
+        .settings-panel {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s ease;
+        }
+        .settings-panel.open { opacity: 1; pointer-events: auto; }
+
+        .settings-content {
+            background: var(--glass-card-bg);
+            backdrop-filter: blur(20px);
+            width: 90%;
+            max-width: 380px;
+            border-radius: 25px;
+            padding: 25px;
+            border: 1px solid var(--glass-border-color);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            color: var(--primary-text-color);
+        }
+        .settings-content h2 { margin-bottom: 20px; font-size: 20px; text-align: center; }
+
+        .setting-group { margin-bottom: 18px; }
+        .setting-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
+        .setting-control { display: flex; align-items: center; gap: 10px; }
+        .setting-control input[type="color"] { width: 40px; height: 40px; border: none; background: transparent; cursor: pointer; }
+        .setting-control input[type="range"] { flex: 1; }
+        .setting-control input[type="file"] { font-size: 12px; }
+        .setting-control .value-label { min-width: 30px; text-align: center; background: rgba(0,0,0,0.05); padding: 0 5px; border-radius: 4px; }
+
+        .close-settings {
+            width: 100%; padding: 10px;
+            border: none; border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            color: var(--primary-text-color);
+            border: 1px solid var(--glass-border-color);
+        }
+
+        @media screen and (max-width: 450px) {
+            .app-container { padding: 20px 12px 120px; }
+            .bottom-nav { width: 90%; padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <div class="header-area">
+            <div class="header-title">
+                <h1>CET-4</h1>
+                <div class="sub">距离考试还有 <span>120</span> 天</div>
+            </div>
+            <div class="settings-btn" id="openSettingsBtn">
+                <i class="fas fa-sliders-h"></i>
+            </div>
+        </div>
+
+        <div class="glass-card progress-card">
+            <div class="progress-top">
+                <div class="circle-progress-container">
+                    <div class="circle-chart">
+                        <svg width="80" height="80">
+                            <circle class="circle-bg" cx="40" cy="40" r="36"></circle>
+                            <circle class="circle-progress" id="mainCircle" cx="40" cy="40" r="36"></circle>
+                        </svg>
+                        <div class="circle-text">60%<small>学习进度</small></div>
+                    </div>
+                    <div class="today-study">
+                        <h3>今日学习</h3>
+                        <div class="sub-today">已学 45 / 75 词</div>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" style="width: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn">继续学习 <i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-item"><h4>1200</h4><p>已掌握单词</p></div>
+                <div class="stat-item"><h4>320</h4><p>今日新词</p></div>
+                <div class="stat-item"><h4>15</h4><p>学习(分钟)</p></div>
+                <div class="stat-item"><h4>8</h4><p>打卡(天)</p></div>
+            </div>
+        </div>
+
+        <div class="grid-2x3">
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-font"></i><span>单词</span></div>
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-list-ul"></i><span>语法</span></div>
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-quote-right"></i><span>词组</span></div>
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-pen-fancy"></i><span>读写</span></div>
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-headphones"></i><span>听力</span></div>
+            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-check-square"></i><span>测试</span></div>
+        </div>
+
+        <div class="glass-card">
+            <div class="plan-card-header">
+                <h3>学习计划</h3>
+                <div class="view-all">查看全部 <i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="plan-content">
+                <div class="plan-icon-box">CET-4<br>核心</div>
+                <div class="plan-info">
+                    <div class="plan-title">四级核心词汇 (高频版)</div>
+                    <div class="plan-date">计划完成日期: 2024.09.30</div>
+                    <div class="plan-progress-track">
+                        <div class="plan-progress-fill" style="width: 60%;"></div>
+                    </div>
+                </div>
+                <div class="plan-percent">60%</div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="task-card-header">
+                <h3>今日任务</h3>
+                <div class="view-all"><i class="fas fa-chevron-right"></i></div>
+            </div>
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-icon"><i class="fas fa-check-circle" style="color: #fff;"></i></div>
+                    <div class="task-text">学习 50 个新单词</div>
+                    <div class="task-progress">30 / 50</div>
+                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
+                </div>
+                <div class="task-item">
+                    <div class="task-icon"><i class="far fa-file-alt"></i></div>
+                    <div class="task-text">完成 1 篇阅读理解</div>
+                    <div class="task-progress">0 / 1</div>
+                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
+                </div>
+                <div class="task-item">
+                    <div class="task-icon"><i class="fas fa-headphones"></i></div>
+                    <div class="task-text">听力练习 15 分钟</div>
+                    <div class="task-progress">0 / 15</div>
+                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-nav-wrapper">
+        <div class="bottom-nav">
+            <div class="nav-btn"><i class="far fa-image"></i></div>
+            <div class="nav-btn middle"><i class="fas fa-cube"></i></div>
+            <div class="nav-btn"><i class="fas fa-chart-simple"></i></div>
+        </div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-content">
+            <h2>个性化设置</h2>
+
+            <div class="setting-group">
+                <label>🎨 字体颜色</label>
+                <div class="setting-control">
+                    <input type="color" id="textColorInput" value="#222222">
+                    <span>点击色块选择</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>🎨 图标颜色</label>
+                <div class="setting-control">
+                    <input type="color" id="iconColorInput" value="#333333">
+                    <span>点击色块选择</span>
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>🖼️ 更换背景 <span style="font-size:12px; opacity:0.7;">(上传图片)</span></label>
+                <input type="file" id="bgUploadInput" accept="image/*">
+            </div>
+
+            <div class="setting-group">
+                <label>🌀 毛玻璃透明度</label>
+                <div class="setting-control">
+                    <input type="range" id="glassOpacityRange" min="0.1" max="1.0" step="0.05" value="0.35">
+                    <span class="value-label" id="opacityValue">0.35</span>
+                </div>
+            </div>
+
+            <button class="close-settings" id="closeSettingsBtn">关闭设置</button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const settingsPanel = document.getElementById('settingsPanel');
+            const openBtn = document.getElementById('openSettingsBtn');
+            const closeBtn = document.getElementById('closeSettingsBtn');
+
+            const textColorInput = document.getElementById('textColorInput');
+            const iconColorInput = document.getElementById('iconColorInput');
+            const bgUpload = document.getElementById('bgUploadInput');
+            const opacityRange = document.getElementById('glassOpacityRange');
+            const opacityValue = document.getElementById('opacityValue');
+
+            const root = document.documentElement;
+
+            openBtn.addEventListener('click', () => settingsPanel.classList.add('open'));
+            closeBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
+            settingsPanel.addEventListener('click', (e) => {
+                if(e.target === settingsPanel) settingsPanel.classList.remove('open');
+            });
+
+            textColorInput.addEventListener('input', (e) => {
+                root.style.setProperty('--primary-text-color', e.target.value);
+            });
+
+            iconColorInput.addEventListener('input', (e) => {
+                root.style.setProperty('--icon-color', e.target.value);
+            });
+
+            bgUpload.addEventListener('change', function(e) {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(loadEvent) {
+                        root.style.setProperty('--bg-image', 'url(\'' + loadEvent.target.result + '\')');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            opacityRange.addEventListener('input', function() {
+                const val = this.value;
+                opacityValue.textContent = val;
+                root.style.setProperty('--glass-card-bg', 'rgba(255, 255, 255, ' + val + ')');
+            });
+
+            root.style.setProperty('--glass-card-bg', 'rgba(255, 255, 255, 0.35)');
+        })();
+
+        function toggleActive(element) {
+            if(element.classList.contains('active')) {
+                element.classList.remove('active');
+            } else {
+                document.querySelectorAll('.func-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                element.classList.add('active');
+            }
+        }
+    </script>
+
+    <!-- PWA: 注册 Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(function(reg) {
+                console.log('SW registered:', reg.scope);
+            }).catch(function(err) {
+                console.log('SW failed:', err);
+            });
+        }
+    </script>
+</body>
+</html>
