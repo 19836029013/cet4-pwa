@@ -5,8 +5,8 @@
   "start_url": "english-dashboard.html",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#1a1a1a",
+  "theme_color": "#1a1a1a",
   "lang": "zh-CN",
   "icons": [
     {

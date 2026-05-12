@@ -2,639 +2,911 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CET-4 备战</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>CET-4 单词学习</title>
 
-    <!-- PWA: iOS 全屏模式 -->
+    <!-- PWA Meta -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CET-4">
     <link rel="apple-touch-icon" href="icon.svg">
-
-    <!-- PWA: Android / 通用 -->
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#1a1a1a">
     <link rel="manifest" href="manifest.json">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ============================
+           美术资产：CSS 变量体系
+           ============================ */
         :root {
-            --glass-card-bg: rgba(255, 255, 255, 0.35);
-            --glass-card-blur: 12px;
-            --glass-border-color: rgba(255, 255, 255, 0.4);
-            --primary-text-color: #222222;
-            --secondary-text-color: #555555;
-            --icon-color: #333333;
-            --highlight-color: #ffffff;
-            --bg-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80');
-            /* 底部导航栏专用（默认更深更模糊，不和卡片重叠糊成一片） */
-            --nav-bg: rgba(255, 255, 255, 0.72);
-            --nav-blur: 22px;
+            --bg-main: #1a1a1a;
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-blur: 20px;
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --card-radius: 24px;
+            --card-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b0b0;
+            --text-highlight: #4da6ff;
+            --color-remember: #4caf50;
+            --color-vague: #a1887f;
+            --color-forget: #ef5350;
+            --status-bar-height: env(safe-area-inset-top);
+
+            /* 导航栏专用 */
+            --nav-bg: rgba(255, 255, 255, 0.12);
+            --nav-blur: 24px;
+
+            /* 可自定义壁纸 */
+            --bg-image: none;
+            --wallpaper-brightness: 0.4;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
+        /* ============================
+           全局重置与基础
+           ============================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body {
-            background-image: var(--bg-image);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-color: #d4e8f5;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 420px;
-            padding: 20px 15px 120px;
-            margin: 0 auto;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex: 1;
-            scrollbar-width: none;
-        }
-        .app-container::-webkit-scrollbar { display: none; }
-
-        .glass-card {
-            background: var(--glass-card-bg);
-            backdrop-filter: blur(var(--glass-card-blur));
-            -webkit-backdrop-filter: blur(var(--glass-card-blur));
-            border: 1px solid var(--glass-border-color);
-            border-radius: 20px;
-            padding: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-            color: var(--primary-text-color);
-        }
-
-        .header-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            color: var(--primary-text-color);
-        }
-        .header-title h1 { font-size: 26px; font-weight: 700; letter-spacing: 1px; }
-        .header-title .sub { margin-top: 4px; font-size: 13px; opacity: 0.8; display: flex; align-items: center; gap: 5px; }
-        .header-title .sub span { background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 10px; backdrop-filter: blur(2px); border: 1px solid rgba(255,255,255,0.2); }
-
-        .settings-btn {
-            width: 36px; height: 36px;
-            background: var(--glass-card-bg);
-            backdrop-filter: blur(5px);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            border: 1px solid var(--glass-border-color);
-            cursor: pointer;
-            color: var(--icon-color);
-            transition: all 0.2s;
-        }
-        .settings-btn:hover { background: rgba(255,255,255,0.6); }
-
-        .progress-card {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .progress-top { display: flex; justify-content: space-between; align-items: center; }
-        .circle-progress-container {
-            display: flex; align-items: center; gap: 15px;
-        }
-        .circle-chart {
-            width: 80px; height: 80px;
+            background: var(--bg-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-primary);
+            height: 100vh; width: 100vw; overflow: hidden;
             position: relative;
         }
-        .circle-chart svg {
-            transform: rotate(-90deg);
-        }
-        .circle-chart circle {
-            fill: none;
-            stroke-width: 6;
-            stroke-linecap: round;
-        }
-        .circle-bg { stroke: rgba(255, 255, 255, 0.3); }
-        .circle-progress { stroke: #ffffff; stroke-dasharray: 226; stroke-dashoffset: 90; transition: stroke-dashoffset 0.5s; }
-
-        .circle-text {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .circle-text small { display: block; font-size: 10px; font-weight: normal; opacity: 0.8; }
-
-        .today-study { flex: 1; }
-        .today-study h3 { font-size: 16px; margin-bottom: 4px; }
-        .today-study .sub-today { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
-        .progress-bar-track { width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: #ffffff; width: 60%; transition: width 0.5s; }
-
-        .continue-btn {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid var(--glass-border-color);
-            border-radius: 20px;
-            font-size: 12px;
-            color: var(--primary-text-color);
-            backdrop-filter: blur(4px);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .continue-btn:hover { background: rgba(255,255,255,0.4); }
-
-        .stats-row {
-            display: flex;
-            justify-content: space-between;
-            text-align: center;
-            padding-top: 10px;
-            border-top: 1px solid var(--glass-border-color);
-        }
-        .stat-item h4 { font-size: 16px; font-weight: bold; }
-        .stat-item p { font-size: 10px; opacity: 0.7; }
-
-        .grid-2x3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-        .func-item {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border-color);
-            border-radius: 16px;
-            padding: 16px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: var(--primary-text-color);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.1);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-        }
-        .func-item i { font-size: 24px; color: var(--icon-color); transition: all 0.2s ease; }
-        .func-item span { font-size: 14px; font-weight: 600; opacity: 0.9; }
-
-        .func-item:active {
-            transform: scale(0.95);
-        }
-        .func-item.active {
-            background: rgba(111, 192, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(111, 192, 255, 0.6);
-            box-shadow: 0 0 20px rgba(111, 192, 255, 0.1);
-        }
-        .func-item.active i {
-            color: #ffffff;
-            text-shadow: 0 0 10px rgba(111, 192, 255, 0.5);
-        }
-
-        .plan-card-header, .task-card-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        .plan-card-header h3, .task-card-header h3 { font-size: 16px; font-weight: bold; }
-        .view-all { font-size: 12px; opacity: 0.7; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-
-        .plan-content { display: flex; gap: 12px; align-items: center; }
-        .plan-icon-box {
-            width: 48px; height: 48px; background: rgba(0,0,0,0.1); border-radius: 10px;
-            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.2; color: var(--primary-text-color);
-            flex-shrink: 0;
-            backdrop-filter: blur(2px);
-        }
-        .plan-info { flex: 1; }
-        .plan-title { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
-        .plan-date { font-size: 11px; opacity: 0.7; margin-bottom: 6px; }
-        .plan-progress-track { width: 100%; height: 6px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; margin-top: 5px; }
-        .plan-progress-fill { height: 100%; background: #ffffff; width: 60%; transition: width 0.5s; }
-        .plan-percent { font-size: 12px; opacity: 0.7; width: 30px; text-align: right; }
-
-        .task-list { display: flex; flex-direction: column; gap: 12px; }
-        .task-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid var(--glass-border-color);
-            backdrop-filter: blur(4px);
-        }
-        .task-icon { color: var(--icon-color); width: 18px; text-align: center; }
-        .task-text { flex: 1; font-size: 13px; }
-        .task-progress { font-size: 12px; opacity: 0.7; }
-
-        .bottom-nav-wrapper {
-            position: fixed;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            z-index: 999;
+        /* 壁纸层 */
+        body::before {
+            content: ''; position: fixed; inset: 0; z-index: 0;
+            background-image: var(--bg-image);
+            background-size: cover; background-position: center;
+            filter: brightness(var(--wallpaper-brightness));
             pointer-events: none;
         }
-        .bottom-nav {
-            pointer-events: auto;
-            width: 85%;
-            max-width: 400px;
-            background: var(--nav-bg);
-            backdrop-filter: blur(var(--nav-blur));
-            -webkit-backdrop-filter: blur(var(--nav-blur));
-            border: 1px solid var(--glass-border-color);
-            border-radius: 30px;
-            padding: 10px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
-        .nav-btn {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            color: var(--primary-text-color);
-            font-size: 18px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .nav-btn i { color: var(--icon-color); }
-        .nav-btn.middle {
-            width: 50px; height: 50px;
-            background: rgba(255,255,255,0.3);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border: 1px solid var(--glass-border-color);
-            font-size: 22px;
-        }
-        .nav-btn:hover { background: rgba(255,255,255,0.5); }
+        body.has-wallpaper::before { display: block; }
 
-        .settings-panel {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(8px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.3s ease;
+        #app-frame {
+            position: relative; z-index: 1;
+            width: 100vw; height: 100dvh;
+            display: flex; flex-direction: column; overflow: hidden;
+            padding-top: var(--status-bar-height);
         }
-        .settings-panel.open { opacity: 1; pointer-events: auto; }
+        .app-screen { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; }
 
-        .settings-content {
-            background: var(--glass-card-bg);
-            backdrop-filter: blur(20px);
-            width: 90%;
-            max-width: 380px;
-            border-radius: 25px;
-            padding: 25px;
-            border: 1px solid var(--glass-border-color);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            color: var(--primary-text-color);
+        /* ============================
+           毛玻璃组件
+           ============================ */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            box-shadow: var(--card-shadow);
         }
-        .settings-content h2 { margin-bottom: 20px; font-size: 20px; text-align: center; }
-
-        .setting-group { margin-bottom: 18px; }
-        .setting-group label { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 500; }
-        .setting-control { display: flex; align-items: center; gap: 10px; }
-        .setting-control input[type="color"] { width: 40px; height: 40px; border: none; background: transparent; cursor: pointer; }
-        .setting-control input[type="range"] { flex: 1; }
-        .setting-control input[type="file"] { font-size: 12px; }
-        .setting-control .value-label { min-width: 30px; text-align: center; background: rgba(0,0,0,0.05); padding: 0 5px; border-radius: 4px; }
-
-        .close-settings {
-            width: 100%; padding: 10px;
-            border: none; border-radius: 12px;
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(5px);
-            margin-top: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 16px;
-            color: var(--primary-text-color);
-            border: 1px solid var(--glass-border-color);
+        .glass-card-sm {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: calc(var(--card-radius) - 6px);
         }
 
-        @media screen and (max-width: 450px) {
-            .app-container { padding: 20px 12px 120px; }
-            .bottom-nav { width: 90%; padding: 10px 20px; }
+        /* ============================
+           页面切换
+           ============================ */
+        .page {
+            position: absolute; inset: 0;
+            padding: 12px 16px;
+            display: flex; flex-direction: column;
+            opacity: 0; transform: scale(0.98); transition: opacity 0.35s ease, transform 0.3s ease;
+            pointer-events: none; overflow-y: auto;
         }
+        .page.active { opacity: 1; transform: scale(1); pointer-events: all; }
+        .content-area { flex: 1; padding-bottom: 10px; overflow-y: auto; }
+        .content-area::-webkit-scrollbar { width: 0; }
+
+        /* ============================
+           首页
+           ============================ */
+        .header-dash { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cet-logo { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+        .timer-box { background: rgba(0,0,0,0.4); padding: 4px 12px; border-radius: 30px; font-size: 14px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+        .timer-box span { color: #fff; font-weight: 600; }
+        .settings-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        .progress-card { display: flex; align-items: center; gap: 20px; padding: 16px 20px; margin-bottom: 14px; }
+        .ring-container { position: relative; width: 76px; height: 76px; flex-shrink: 0; display: flex; justify-content: center; align-items: center; }
+        .ring-svg { transform: rotate(-90deg); width: 76px; height: 76px; }
+        .ring-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
+        .ring-progress { fill: none; stroke: #f5f5f5; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 245; transition: stroke-dashoffset 0.6s ease; }
+        .ring-text { position: absolute; font-size: 20px; font-weight: 700; }
+        .today-info { flex: 1; min-width: 0; }
+        .today-info h3 { font-size: 18px; font-weight: 600; }
+        .today-info p { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #f5f5f5; border-radius: 4px; transition: width 0.4s; }
+        .btn-continue { background: rgba(255,255,255,0.2); border: none; padding: 8px 16px; border-radius: 30px; color: #fff; font-weight: 500; font-size: 13px; backdrop-filter: blur(5px); cursor: pointer; white-space: nowrap; }
+
+        .stats-row { display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 14px; }
+        .stat-item { text-align: center; }
+        .stat-item strong { display: block; font-size: 20px; font-weight: 700; }
+        .stat-item span { font-size: 11px; color: var(--text-secondary); }
+
+        .grid-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+        .menu-item { aspect-ratio: 1 / 0.85; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 14px; gap: 6px; color: var(--text-secondary); cursor: pointer; transition: all 0.15s; }
+        .menu-item i { font-size: 24px; color: var(--text-primary); }
+        .menu-item .icon-box { width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; border-radius: 20px; background: rgba(0,0,0,0.2); }
+        .menu-item:active { transform: scale(0.95); }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .section-header h3 { font-size: 16px; font-weight: 600; }
+        .section-header .more { font-size: 12px; color: var(--text-secondary); cursor: pointer; }
+
+        .plan-card { padding: 14px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 14px; }
+        .plan-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.06); display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2; flex-shrink: 0; }
+        .plan-info { flex: 1; min-width: 0; }
+        .plan-info h4 { font-size: 14px; font-weight: 600; }
+        .plan-info p { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+        .plan-progress-sm { width: 100%; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-top: 6px; }
+        .plan-progress-sm .fill { height: 100%; background: #f5f5f5; border-radius: 4px; }
+        .plan-pct { font-size: 13px; color: var(--text-secondary); flex-shrink: 0; }
+
+        .task-list { display: flex; flex-direction: column; gap: 8px; }
+        .task-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+        .task-row .t-icon { width: 20px; text-align: center; color: var(--text-secondary); }
+        .task-row .t-text { flex: 1; font-size: 13px; }
+        .task-row .t-prog { font-size: 12px; color: var(--text-secondary); }
+        .task-row .done .t-icon { color: var(--color-remember); }
+
+        /* ============================
+           拼写页
+           ============================ */
+        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 10px; }
+        .top-nav .title { font-size: 18px; font-weight: 600; }
+        .top-nav .back-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+
+        .word-detail-card { padding: 16px; margin-bottom: 14px; }
+        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .word-main { display: flex; align-items: center; gap: 8px; }
+        .word-main h1 { font-size: 26px; font-weight: 700; }
+        .word-tag { font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; color: var(--text-secondary); }
+        .pronunciation { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-secondary); margin-bottom: 10px; }
+        .btn-sound { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 11px; cursor: pointer; }
+        .def { font-size: 14px; margin-bottom: 10px; }
+        .example-box { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+        .example-box .en { font-size: 13px; margin-bottom: 4px; }
+        .example-box .en b { color: #fff; }
+        .example-box .cn { font-size: 12px; color: var(--text-secondary); }
+
+        .spell-area { padding: 8px 0; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
+        .spell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .spell-header h4 { font-size: 16px; font-weight: 600; }
+        .spell-header .hint { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+
+        .input-grid { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
+        .input-box { width: 30px; height: 38px; border-bottom: 2px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; font-size: 17px; font-weight: 600; border-radius: 3px; transition: all 0.2s; }
+        .input-box.filled { border-color: #fff; background: rgba(255,255,255,0.05); }
+        .input-box.correct { border-color: var(--color-remember); background: rgba(76,175,80,0.15); }
+        .input-box.wrong { border-color: var(--color-forget); background: rgba(244,67,54,0.15); }
+
+        .kb-row { display: flex; gap: 5px; justify-content: center; margin-bottom: 5px; }
+        .kb-key { min-width: 28px; height: 38px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 15px; color: var(--text-primary); cursor: pointer; transition: all 0.1s; flex: 1; max-width: 34px; }
+        .kb-key:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
+        .kb-key.special { background: rgba(255,255,255,0.05); flex: 1.8; max-width: 54px; }
+
+        .action-row { display: flex; gap: 10px; margin-top: 8px; }
+        .action-btn { flex: 1; padding: 10px; border-radius: var(--card-radius); text-align: center; font-weight: 500; font-size: 14px; border: none; cursor: pointer; }
+        .action-btn.clear { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+        .action-btn.check { background: rgba(255,255,255,0.2); color: #fff; }
+        .action-btn.check:active { background: rgba(255,255,255,0.3); }
+
+        /* ============================
+           弹窗 / Overlays
+           ============================ */
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .overlay.show { opacity: 1; pointer-events: all; }
+        .modal { max-width: 300px; width: 85%; padding: 20px; text-align: center; }
+        .modal i { font-size: 40px; margin-bottom: 10px; color: var(--text-secondary); }
+        .modal h3 { font-size: 18px; margin-bottom: 6px; }
+        .modal p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+
+        .feedback-options { display: flex; gap: 6px; margin-top: 8px; }
+        .f-btn { flex: 1; padding: 12px 4px; border-radius: 16px; border: none; text-align: center; color: #fff; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+        .f-btn:active { transform: scale(0.95); opacity: 0.8; }
+        .f-btn.green { background: rgba(76,175,80,0.3); border: 1px solid rgba(76,175,80,0.2); }
+        .f-btn.brown { background: rgba(161,136,127,0.4); border: 1px solid rgba(161,136,127,0.2); }
+        .f-btn.red { background: rgba(239,83,80,0.4); border: 1px solid rgba(239,83,80,0.2); }
+        .f-btn i { font-size: 20px; display: block; margin-bottom: 2px; color: #fff; }
+        .f-btn span { display: block; font-size: 10px; color: rgba(255,255,255,0.6); }
+
+        .modal-actions { display: flex; gap: 8px; }
+        .modal-btn { flex: 1; padding: 8px; border-radius: 30px; border: none; font-weight: 500; cursor: pointer; font-size: 13px; }
+        .modal-btn.primary { background: #fff; color: #333; }
+        .modal-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
+
+        /* ============================
+           语法笔记本页
+           ============================ */
+        .grammar-form { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .grammar-form input { flex: 1; min-width: 100px; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.06); color: #fff; font-size: 13px; outline: none; }
+        .grammar-form input:focus { border-color: rgba(255,255,255,0.3); }
+        .grammar-form button { padding: 8px 14px; border-radius: 12px; border: none; background: rgba(255,255,255,0.15); color: #fff; cursor: pointer; font-size: 13px; }
+        .grammar-item { padding: 14px 16px; margin-bottom: 10px; }
+        .grammar-item h4 { font-size: 15px; margin-bottom: 4px; }
+        .grammar-item .g-tag { font-size: 10px; background: rgba(255,255,255,0.08); padding: 2px 8px; border-radius: 10px; color: var(--text-secondary); }
+        .grammar-item .g-ex { font-size: 13px; color: var(--text-highlight); font-style: italic; margin-top: 6px; }
+
+        /* ============================
+           设置面板
+           ============================ */
+        .settings-panel { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .settings-panel.open { opacity: 1; pointer-events: all; }
+        .settings-content { width: 88%; max-width: 360px; max-height: 85vh; overflow-y: auto; padding: 20px; }
+        .settings-content h2 { text-align: center; margin-bottom: 16px; font-size: 18px; }
+        .setting-group { margin-bottom: 14px; }
+        .setting-group label { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .setting-row { display: flex; align-items: center; gap: 8px; }
+        .setting-row input[type="range"] { flex: 1; accent-color: #fff; }
+        .setting-row .val { min-width: 36px; text-align: center; font-size: 12px; color: var(--text-secondary); }
+        .setting-row input[type="color"] { width: 36px; height: 36px; border: none; border-radius: 50%; cursor: pointer; background: transparent; }
+        .wallpaper-input { display: flex; gap: 6px; margin-bottom: 6px; }
+        .wallpaper-input input { flex: 1; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.06); color: #fff; font-size: 12px; outline: none; }
+        .wallpaper-input button { padding: 6px 12px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.1); color: #fff; cursor: pointer; font-size: 12px; }
+        .preset-dots { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+        .preset-dot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: 0.15s; }
+        .preset-dot:active { transform: scale(0.9); }
+        .btn-close-settings { width: 100%; padding: 10px; border-radius: 14px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.1); color: #fff; font-size: 15px; cursor: pointer; margin-top: 4px; }
+
+        /* ============================
+           底部导航
+           ============================ */
+        .bottom-nav { background: var(--nav-bg); backdrop-filter: blur(var(--nav-blur)); -webkit-backdrop-filter: blur(var(--nav-blur)); border-top: 1px solid var(--glass-border); padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); display: flex; justify-content: space-around; flex-shrink: 0; position: relative; z-index: 50; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: var(--text-secondary); font-size: 10px; padding: 4px 0; }
+        .nav-item i { font-size: 22px; color: var(--text-secondary); transition: color 0.2s; }
+        .nav-item.active i { color: #fff; }
+        .nav-item.active span { color: #fff; }
+        .nav-item.middle { position: relative; top: -10px; }
+        .nav-item.middle i { background: #fff; color: #333; padding: 11px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: 20px; }
+
+        /* ============================
+           提示条
+           ============================ */
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); border-radius: 30px; padding: 8px 20px; font-size: 13px; color: #fff; z-index: 300; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
+        .toast.show { opacity: 1; }
     </style>
 </head>
-<body>
+<body class="">
 
-    <div class="app-container">
+<div id="app-frame">
+<div class="app-screen">
 
-        <div class="header-area">
-            <div class="header-title">
-                <h1>CET-4</h1>
-                <div class="sub">距离考试还有 <span>120</span> 天</div>
+    <!-- ================= 首页 ================= -->
+    <div id="page-home" class="page active">
+        <div class="content-area">
+            <div class="header-dash">
+                <h1 class="cet-logo">CET-4</h1>
+                <div class="header-right">
+                    <div class="timer-box">考试 <span id="countdown-days">120</span> 天</div>
+                    <div class="settings-btn" id="btnOpenSettings"><i class="fas fa-sliders-h"></i></div>
+                </div>
             </div>
-            <div class="settings-btn" id="openSettingsBtn">
-                <i class="fas fa-sliders-h"></i>
-            </div>
-        </div>
 
-        <div class="glass-card progress-card">
-            <div class="progress-top">
-                <div class="circle-progress-container">
-                    <div class="circle-chart">
-                        <svg width="80" height="80">
-                            <circle class="circle-bg" cx="40" cy="40" r="36"></circle>
-                            <circle class="circle-progress" id="mainCircle" cx="40" cy="40" r="36"></circle>
+            <div class="glass-card progress-card">
+                <div style="display:flex;align-items:center;gap:16px;">
+                    <div class="ring-container">
+                        <svg class="ring-svg" viewBox="0 0 100 100">
+                            <circle class="ring-bg" cx="50" cy="50" r="45"></circle>
+                            <circle class="ring-progress" id="ringCircle" cx="50" cy="50" r="45"></circle>
                         </svg>
-                        <div class="circle-text">60%<small>学习进度</small></div>
+                        <div class="ring-text" id="ringPct">60%</div>
                     </div>
-                    <div class="today-study">
+                    <div class="today-info">
                         <h3>今日学习</h3>
-                        <div class="sub-today">已学 45 / 75 词</div>
-                        <div class="progress-bar-track">
-                            <div class="progress-bar-fill" style="width: 60%;"></div>
-                        </div>
+                        <p>已学 <span id="todayWords">45</span> / <span id="todayGoal">75</span> 词</p>
+                        <div class="progress-bar"><div class="progress-fill" id="todayBar" style="width:60%"></div></div>
                     </div>
                 </div>
-                <button class="continue-btn">继续学习 <i class="fas fa-chevron-right"></i></button>
+                <button class="btn-continue" id="btnContinue">继续 <i class="fas fa-chevron-right"></i></button>
             </div>
 
             <div class="stats-row">
-                <div class="stat-item"><h4>1200</h4><p>已掌握单词</p></div>
-                <div class="stat-item"><h4>320</h4><p>今日新词</p></div>
-                <div class="stat-item"><h4>15</h4><p>学习(分钟)</p></div>
-                <div class="stat-item"><h4>8</h4><p>打卡(天)</p></div>
+                <div class="stat-item"><strong id="statVocab">1200</strong><span>已掌握单词</span></div>
+                <div class="stat-item"><strong id="statNew">320</strong><span>今日新词</span></div>
+                <div class="stat-item"><strong id="statMinutes">15</strong><span>学习(分钟)</span></div>
+                <div class="stat-item"><strong id="statDays">8</strong><span>打卡(天)</span></div>
             </div>
-        </div>
 
-        <div class="grid-2x3">
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-font"></i><span>单词</span></div>
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-list-ul"></i><span>语法</span></div>
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-quote-right"></i><span>词组</span></div>
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-pen-fancy"></i><span>读写</span></div>
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-headphones"></i><span>听力</span></div>
-            <div class="func-item" onclick="toggleActive(this)"><i class="fas fa-check-square"></i><span>测试</span></div>
-        </div>
-
-        <div class="glass-card">
-            <div class="plan-card-header">
-                <h3>学习计划</h3>
-                <div class="view-all">查看全部 <i class="fas fa-chevron-right"></i></div>
+            <div class="grid-menu">
+                <div class="glass-card-sm menu-item" data-action="spell"><div class="icon-box"><i class="fas fa-font"></i></div><span>单词</span></div>
+                <div class="glass-card-sm menu-item" data-action="grammar"><div class="icon-box"><i class="fas fa-list-ul"></i></div><span>语法</span></div>
+                <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-quote-right"></i></div><span>词组</span></div>
+                <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-pen-fancy"></i></div><span>读写</span></div>
+                <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-headphones"></i></div><span>听力</span></div>
+                <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-check-square"></i></div><span>测试</span></div>
             </div>
-            <div class="plan-content">
-                <div class="plan-icon-box">CET-4<br>核心</div>
+
+            <div class="section-header"><h3>学习计划</h3><span class="more">查看全部 <i class="fas fa-chevron-right"></i></span></div>
+            <div class="glass-card plan-card">
+                <div class="plan-icon">CET-4<br>核心</div>
                 <div class="plan-info">
-                    <div class="plan-title">四级核心词汇 (高频版)</div>
-                    <div class="plan-date">计划完成日期: 2024.09.30</div>
-                    <div class="plan-progress-track">
-                        <div class="plan-progress-fill" style="width: 60%;"></div>
-                    </div>
+                    <h4>四级核心词汇 (高频版)</h4>
+                    <p>计划完成: 2024.09.30</p>
+                    <div class="plan-progress-sm"><div class="fill" id="planFill" style="width:60%"></div></div>
                 </div>
-                <div class="plan-percent">60%</div>
+                <div class="plan-pct" id="planPct">60%</div>
             </div>
-        </div>
 
-        <div class="glass-card">
-            <div class="task-card-header">
-                <h3>今日任务</h3>
-                <div class="view-all"><i class="fas fa-chevron-right"></i></div>
-            </div>
+            <div class="section-header"><h3>今日任务</h3><i class="fas fa-chevron-right more"></i></div>
             <div class="task-list">
-                <div class="task-item">
-                    <div class="task-icon"><i class="fas fa-check-circle" style="color: #fff;"></i></div>
-                    <div class="task-text">学习 50 个新单词</div>
-                    <div class="task-progress">30 / 50</div>
-                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
-                </div>
-                <div class="task-item">
-                    <div class="task-icon"><i class="far fa-file-alt"></i></div>
-                    <div class="task-text">完成 1 篇阅读理解</div>
-                    <div class="task-progress">0 / 1</div>
-                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
-                </div>
-                <div class="task-item">
-                    <div class="task-icon"><i class="fas fa-headphones"></i></div>
-                    <div class="task-text">听力练习 15 分钟</div>
-                    <div class="task-progress">0 / 15</div>
-                    <div><i class="fas fa-chevron-right" style="font-size: 12px; opacity: 0.5;"></i></div>
-                </div>
+                <div class="glass-card-sm task-row"><div class="t-icon"><i class="fas fa-check-circle"></i></div><div class="t-text">学习 50 个新单词</div><div class="t-prog">30 / 50</div></div>
+                <div class="glass-card-sm task-row"><div class="t-icon"><i class="far fa-file-alt"></i></div><div class="t-text">完成 1 篇阅读理解</div><div class="t-prog">0 / 1</div></div>
+                <div class="glass-card-sm task-row"><div class="t-icon"><i class="fas fa-headphones"></i></div><div class="t-text">听力练习 15 分钟</div><div class="t-prog">0 / 15</div></div>
             </div>
-        </div>
-
-    </div>
-
-    <div class="bottom-nav-wrapper">
-        <div class="bottom-nav">
-            <div class="nav-btn"><i class="far fa-image"></i></div>
-            <div class="nav-btn middle"><i class="fas fa-cube"></i></div>
-            <div class="nav-btn"><i class="fas fa-chart-simple"></i></div>
         </div>
     </div>
 
-    <div class="settings-panel" id="settingsPanel">
-        <div class="settings-content">
-            <h2>个性化设置</h2>
+    <!-- ================= 拼写页 ================= -->
+    <div id="page-spell" class="page">
+        <div class="content-area">
+            <div class="top-nav">
+                <div class="back-btn" id="btnBackHome"><i class="fas fa-chevron-left"></i></div>
+                <span class="title">单词拼写</span>
+                <div class="word-tag" id="spellCat">核心词汇</div>
+            </div>
 
-            <div class="setting-group">
-                <label>🎨 字体颜色</label>
-                <div class="setting-control">
-                    <input type="color" id="textColorInput" value="#222222">
-                    <span>点击色块选择</span>
+            <div class="glass-card word-detail-card" id="wordCard">
+                <div class="word-header">
+                    <div class="word-main">
+                        <h1 id="spellWord">ambitious</h1>
+                        <i class="fas fa-volume-up" style="cursor:pointer;opacity:0.7;" id="btnSpeak"></i>
+                    </div>
+                    <div class="word-tag" id="spellTag">adj.</div>
+                </div>
+                <div class="pronunciation" id="spellPhonetic">/æmˈbɪʃəs/</div>
+                <div class="def" id="spellDef">有雄心的；有野心的；有抱负的</div>
+                <div class="example-box">
+                    <div class="en" id="spellExEn">She is an <b>ambitious</b> young woman with a clear goal.</div>
+                    <div class="cn" id="spellExCn">她是一位有抱负的年轻女性，有着明确的目标。</div>
                 </div>
             </div>
 
-            <div class="setting-group">
-                <label>🎨 图标颜色</label>
-                <div class="setting-control">
-                    <input type="color" id="iconColorInput" value="#333333">
-                    <span>点击色块选择</span>
+            <div class="spell-area">
+                <div class="spell-header">
+                    <h4>拼写练习</h4>
+                    <div class="hint" id="btnHint"><i class="far fa-lightbulb"></i> 提示</div>
+                </div>
+                <div class="input-grid" id="inputGrid"></div>
+                <div class="kb-row"><div class="kb-key" data-key="q">q</div><div class="kb-key" data-key="w">w</div><div class="kb-key" data-key="e">e</div><div class="kb-key" data-key="r">r</div><div class="kb-key" data-key="t">t</div><div class="kb-key" data-key="y">y</div><div class="kb-key" data-key="u">u</div><div class="kb-key" data-key="i">i</div><div class="kb-key" data-key="o">o</div><div class="kb-key" data-key="p">p</div></div>
+                <div class="kb-row"><div class="kb-key" data-key="a">a</div><div class="kb-key" data-key="s">s</div><div class="kb-key" data-key="d">d</div><div class="kb-key" data-key="f">f</div><div class="kb-key" data-key="g">g</div><div class="kb-key" data-key="h">h</div><div class="kb-key" data-key="j">j</div><div class="kb-key" data-key="k">k</div><div class="kb-key" data-key="l">l</div></div>
+                <div class="kb-row"><div class="kb-key special" data-key="back"><i class="fas fa-backspace"></i></div><div class="kb-key" data-key="z">z</div><div class="kb-key" data-key="x">x</div><div class="kb-key" data-key="c">c</div><div class="kb-key" data-key="v">v</div><div class="kb-key" data-key="b">b</div><div class="kb-key" data-key="n">n</div><div class="kb-key" data-key="m">m</div><div class="kb-key special" data-key="enter">确认</div></div>
+                <div class="action-row">
+                    <button class="action-btn clear" id="btnClear">清空</button>
+                    <button class="action-btn check" id="btnCheck">检查</button>
                 </div>
             </div>
-
-            <div class="setting-group">
-                <label>🖼️ 更换背景</label>
-                <div style="display:flex;gap:6px;margin-bottom:8px">
-                    <input type="text" id="bgUrlInput" placeholder="粘贴图片网址..." style="flex:1;padding:6px 10px;border-radius:8px;border:1px solid var(--glass-border-color);background:rgba(255,255,255,0.3);font-size:13px;color:var(--primary-text-color);">
-                    <button id="applyBgBtn" style="padding:6px 14px;border-radius:8px;border:1px solid var(--glass-border-color);background:rgba(255,255,255,0.3);cursor:pointer;font-size:13px;color:var(--primary-text-color);">应用</button>
-                </div>
-                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px">
-                    <span style="font-size:11px;opacity:0.6;">预设：</span>
-                    <button class="preset-bg" data-url="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:linear-gradient(135deg,#a8edea,#fed6e3);cursor:pointer;"></button>
-                    <button class="preset-bg" data-url="https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:linear-gradient(135deg,#667eea,#764ba2);cursor:pointer;"></button>
-                    <button class="preset-bg" data-url="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:linear-gradient(135deg,#f093fb,#f5576c);cursor:pointer;"></button>
-                    <button class="preset-bg" data-url="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:linear-gradient(135deg,#4facfe,#00f2fe);cursor:pointer;"></button>
-                    <button class="preset-bg" data-url="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" style="width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);background:linear-gradient(135deg,#43e97b,#38f9d7);cursor:pointer;"></button>
-                </div>
-                <input type="file" id="bgUploadInput" accept="image/*" style="font-size:11px;opacity:0.7;">
-            </div>
-
-            <div class="setting-group">
-                <label>🌀 毛玻璃透明度</label>
-                <div class="setting-control">
-                    <input type="range" id="glassOpacityRange" min="0.1" max="1.0" step="0.05" value="0.35">
-                    <span class="value-label" id="opacityValue">0.35</span>
-                </div>
-            </div>
-
-            <div class="setting-group">
-                <label>🧭 导航栏透明度</label>
-                <div class="setting-control">
-                    <input type="range" id="navOpacityRange" min="0.2" max="1.0" step="0.05" value="0.72">
-                    <span class="value-label" id="navOpacityValue">0.72</span>
-                </div>
-            </div>
-
-            <div class="setting-group">
-                <label>🧭 导航栏模糊度</label>
-                <div class="setting-control">
-                    <input type="range" id="navBlurRange" min="4" max="40" step="2" value="22">
-                    <span class="value-label" id="navBlurValue">22<span style="font-size:10px">px</span></span>
-                </div>
-            </div>
-
-            <button class="close-settings" id="closeSettingsBtn">关闭设置</button>
         </div>
     </div>
 
-    <script>
-        (function() {
-            const settingsPanel = document.getElementById('settingsPanel');
-            const openBtn = document.getElementById('openSettingsBtn');
-            const closeBtn = document.getElementById('closeSettingsBtn');
+    <!-- ================= 语法笔记本页 ================= -->
+    <div id="page-grammar" class="page">
+        <div class="content-area">
+            <div class="top-nav">
+                <div class="back-btn" id="btnBackHome2"><i class="fas fa-chevron-left"></i></div>
+                <span class="title">语法笔记本</span>
+                <div></div>
+            </div>
+            <div class="grammar-form">
+                <input type="text" id="gTitle" placeholder="语法点名称">
+                <input type="text" id="gTag" placeholder="标签（时态/从句...）" style="max-width:120px">
+                <input type="text" id="gEx" placeholder="例句">
+                <button id="btnAddGrammar">添加</button>
+            </div>
+            <div id="grammarList"></div>
+        </div>
+    </div>
 
-            const textColorInput = document.getElementById('textColorInput');
-            const iconColorInput = document.getElementById('iconColorInput');
-            const bgUpload = document.getElementById('bgUploadInput');
-            const bgUrlInput = document.getElementById('bgUrlInput');
-            const applyBgBtn = document.getElementById('applyBgBtn');
-            const presetBtns = document.querySelectorAll('.preset-bg');
-            const opacityRange = document.getElementById('glassOpacityRange');
-            const opacityValue = document.getElementById('opacityValue');
+    <!-- ================= 底部导航 ================= -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-nav="home"><i class="fas fa-home"></i><span>首页</span></div>
+        <div class="nav-item" data-nav="spell"><i class="fas fa-font"></i><span>单词</span></div>
+        <div class="nav-item middle" data-nav="home"><i class="fas fa-cube"></i></div>
+        <div class="nav-item" data-nav="grammar"><i class="fas fa-list-ul"></i><span>语法</span></div>
+        <div class="nav-item" data-nav="home"><i class="fas fa-chart-bar"></i><span>统计</span></div>
+    </div>
 
-            const navOpacityRange = document.getElementById('navOpacityRange');
-            const navOpacityValue = document.getElementById('navOpacityValue');
-            const navBlurRange = document.getElementById('navBlurRange');
-            const navBlurValue = document.getElementById('navBlurValue');
+</div>
+</div>
 
-            const root = document.documentElement;
+<!-- ================= 反馈弹窗 ================= -->
+<div class="overlay" id="feedbackOverlay">
+    <div class="glass-card modal">
+        <i class="fas fa-question-circle"></i>
+        <h3>这个单词你记住了吗？</h3>
+        <p id="feedbackWordName">ambitious</p>
+        <div class="feedback-options">
+            <button class="f-btn green" data-fb="remember"><i class="fas fa-check-circle"></i><span>记住</span>完全记住了</button>
+            <button class="f-btn brown" data-fb="vague"><i class="fas fa-ellipsis-h"></i><span>模糊</span>有点印象</button>
+            <button class="f-btn red" data-fb="forget"><i class="fas fa-times-circle"></i><span>忘记</span>完全不记得</button>
+        </div>
+    </div>
+</div>
 
-            openBtn.addEventListener('click', () => settingsPanel.classList.add('open'));
-            closeBtn.addEventListener('click', () => settingsPanel.classList.remove('open'));
-            settingsPanel.addEventListener('click', (e) => {
-                if(e.target === settingsPanel) settingsPanel.classList.remove('open');
-            });
+<!-- ================= 结束确认弹窗 ================= -->
+<div class="overlay" id="exitOverlay">
+    <div class="glass-card modal">
+        <i class="fas fa-flag-checkered"></i>
+        <h3>结束本轮练习？</h3>
+        <p>你已完成所有单词，可以开始新一轮练习</p>
+        <div class="modal-actions">
+            <button class="modal-btn secondary" id="btnExitCancel">继续学</button>
+            <button class="modal-btn primary" id="btnExitOk">结束练习</button>
+        </div>
+    </div>
+</div>
 
-            textColorInput.addEventListener('input', (e) => {
-                root.style.setProperty('--primary-text-color', e.target.value);
-            });
+<!-- ================= 设置面板 ================= -->
+<div class="settings-panel" id="settingsPanel">
+    <div class="glass-card settings-content">
+        <h2>个性化设置</h2>
+        <div class="setting-group">
+            <label>🎨 主题色</label>
+            <div class="setting-row"><input type="color" id="setTextColor" value="#f5f5f5"><span style="font-size:12px">主文字颜色</span></div>
+        </div>
+        <div class="setting-group">
+            <label>🌀 毛玻璃透明度</label>
+            <div class="setting-row"><input type="range" id="setGlassOpacity" min="0.02" max="0.25" step="0.01" value="0.08"><span class="val" id="valGlassOpacity">0.08</span></div>
+        </div>
+        <div class="setting-group">
+            <label>🌀 毛玻璃模糊度</label>
+            <div class="setting-row"><input type="range" id="setGlassBlur" min="4" max="40" step="2" value="20"><span class="val" id="valGlassBlur">20px</span></div>
+        </div>
+        <div class="setting-group">
+            <label>🧭 导航栏透明度</label>
+            <div class="setting-row"><input type="range" id="setNavOpacity" min="0.04" max="0.5" step="0.02" value="0.12"><span class="val" id="valNavOpacity">0.12</span></div>
+        </div>
+        <div class="setting-group">
+            <label>🧭 导航栏模糊度</label>
+            <div class="setting-row"><input type="range" id="setNavBlur" min="4" max="40" step="2" value="24"><span class="val" id="valNavBlur">24px</span></div>
+        </div>
+        <div class="setting-group">
+            <label>🖼️ 壁纸网址</label>
+            <div class="wallpaper-input"><input type="text" id="setWallpaperUrl" placeholder="粘贴图片 URL..."><button id="btnApplyWallpaper">应用</button></div>
+            <div class="preset-dots">
+                <div class="preset-dot" data-wp="" style="background:#1a1a1a;border-color:#444;" title="默认暗色"></div>
+                <div class="preset-dot" data-wp="https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" style="background:linear-gradient(135deg,#a8edea,#fed6e3)"></div>
+                <div class="preset-dot" data-wp="https://images.unsplash.com/photo-1557683316-973673baf926?w=800&q=80" style="background:linear-gradient(135deg,#667eea,#764ba2)"></div>
+                <div class="preset-dot" data-wp="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" style="background:linear-gradient(135deg,#4facfe,#00f2fe)"></div>
+                <div class="preset-dot" data-wp="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80" style="background:linear-gradient(135deg,#43e97b,#38f9d7)"></div>
+            </div>
+            <div class="setting-row" style="margin-top:4px">
+                <span style="font-size:11px;color:var(--text-secondary)">壁纸亮度</span>
+                <input type="range" id="setWallpaperBrightness" min="0.1" max="0.8" step="0.05" value="0.4"><span class="val" id="valWallpaperBrightness">0.4</span>
+            </div>
+        </div>
+        <button class="btn-close-settings" id="btnCloseSettings">关闭设置</button>
+    </div>
+</div>
 
-            iconColorInput.addEventListener('input', (e) => {
-                root.style.setProperty('--icon-color', e.target.value);
-            });
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-            // 4. 背景更换 — URL 输入
-            function setBgImage(url) {
-                root.style.setProperty('--bg-image', 'url(' + url + ')');
-                try { localStorage.setItem('cet4-bg-url', url); } catch(e) {}
+<script>
+// ==================== 数据层 ====================
+var STORE_KEY = 'cet4_data_v2';
+function loadData() {
+    try { var d = localStorage.getItem(STORE_KEY); if (d) return JSON.parse(d); } catch(e) {}
+    return null;
+}
+function saveData(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch(e) {} }
+function getDefaultData() {
+    return {
+        vocab: [
+            {word:'ambitious',meaning:'有雄心的；有野心的',phonetic:'/æmˈbɪʃəs/',tag:'adj.',exEn:'She is an ambitious young woman with a clear goal.',exCn:'她是一位有抱负的年轻女性，有着明确的目标。',cat:'核心词汇',mastery:0},
+            {word:'experience',meaning:'经验；经历',phonetic:'/ɪkˈspɪriəns/',tag:'n./v.',exEn:'This job requires a lot of experience.',exCn:'这份工作需要很多经验。',cat:'四级高频',mastery:0},
+            {word:'environment',meaning:'环境',phonetic:'/ɪnˈvaɪrənmənt/',tag:'n.',exEn:'We must protect the environment.',exCn:'我们必须保护环境。',cat:'四级高频',mastery:0},
+            {word:'technology',meaning:'技术',phonetic:'/tekˈnɒlədʒi/',tag:'n.',exEn:'Technology changes our lives every day.',exCn:'科技每天都在改变我们的生活。',cat:'四级高频',mastery:0},
+            {word:'communicate',meaning:'交流；沟通',phonetic:'/kəˈmjuːnɪkeɪt/',tag:'v.',exEn:'We need to communicate better.',exCn:'我们需要更好地沟通。',cat:'四级高频',mastery:0},
+            {word:'opportunity',meaning:'机会',phonetic:'/ˌɒpəˈtjuːnəti/',tag:'n.',exEn:'This is a great opportunity for you.',exCn:'这对你来说是个很好的机会。',cat:'四级高频',mastery:0},
+            {word:'knowledge',meaning:'知识',phonetic:'/ˈnɒlɪdʒ/',tag:'n.',exEn:'Knowledge is power.',exCn:'知识就是力量。',cat:'四级高频',mastery:0},
+            {word:'different',meaning:'不同的',phonetic:'/ˈdɪfərənt/',tag:'adj.',exEn:'They have different opinions.',exCn:'他们有不同的意见。',cat:'四级高频',mastery:0},
+            {word:'important',meaning:'重要的',phonetic:'/ɪmˈpɔːtənt/',tag:'adj.',exEn:'This is an important decision.',exCn:'这是个重要的决定。',cat:'四级高频',mastery:0},
+            {word:'government',meaning:'政府',phonetic:'/ˈɡʌvənmənt/',tag:'n.',exEn:'The government announced a new policy.',exCn:'政府宣布了一项新政策。',cat:'四级高频',mastery:0}
+        ],
+        grammar: [
+            {id:1,title:'五种基本句型',tag:'句法',ex:'SV / SVO / SVC / SVOO / SVOC — I run. / I love you. / She is beautiful.'},
+            {id:2,title:'被动语态',tag:'时态/语态',ex:'The file was saved. ≈ file.save() 执行后的结果状态。中文习惯"被…"，英文直接用被动。'},
+            {id:3,title:'定语从句 = 后置的 filter',tag:'从句',ex:'The book that I bought yesterday. 中文修饰语放前面，英文放后面。'}
+        ],
+        checkins: [],
+        startDate: '2026-01-01',
+        spellIndex: 0,
+        settings: {}
+    };
+}
+
+var data = loadData() || getDefaultData();
+
+// ==================== Settings persistence ====================
+var settings = data.settings || {};
+var root = document.documentElement;
+
+function applySettings() {
+    if (settings.textColor) root.style.setProperty('--text-primary', settings.textColor);
+    if (settings.glassOpacity !== undefined) root.style.setProperty('--glass-bg', 'rgba(255,255,255,' + settings.glassOpacity + ')');
+    if (settings.glassBlur !== undefined) root.style.setProperty('--glass-blur', settings.glassBlur + 'px');
+    if (settings.navOpacity !== undefined) root.style.setProperty('--nav-bg', 'rgba(255,255,255,' + settings.navOpacity + ')');
+    if (settings.navBlur !== undefined) root.style.setProperty('--nav-blur', settings.navBlur + 'px');
+    if (settings.wallpaperUrl) {
+        root.style.setProperty('--bg-image', 'url(' + settings.wallpaperUrl + ')');
+        document.body.classList.add('has-wallpaper');
+    }
+    if (settings.wallpaperBrightness !== undefined) root.style.setProperty('--wallpaper-brightness', settings.wallpaperBrightness);
+}
+applySettings();
+
+// ==================== Page navigation ====================
+function switchPage(name) {
+    document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+    var target = document.getElementById('page-' + name);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+    var navs = document.querySelectorAll('.nav-item');
+    navs.forEach(function(n) { if (n.dataset.nav === name) n.classList.add('active'); });
+
+    if (name === 'spell') loadSpellWord();
+    if (name === 'grammar') renderGrammar();
+    if (name === 'home') renderHome();
+}
+
+// Bottom nav click
+document.querySelectorAll('.nav-item').forEach(function(n) {
+    n.addEventListener('click', function() { switchPage(n.dataset.nav); });
+});
+
+// Back buttons
+document.getElementById('btnBackHome').addEventListener('click', function() { switchPage('home'); });
+document.getElementById('btnBackHome2').addEventListener('click', function() { switchPage('home'); });
+
+// 6-grid menu -> spell page
+document.querySelectorAll('.menu-item[data-action]').forEach(function(m) {
+    m.addEventListener('click', function() { switchPage(m.dataset.action); });
+});
+
+// Continue button -> spell
+document.getElementById('btnContinue').addEventListener('click', function() { switchPage('spell'); });
+
+// ==================== Home render ====================
+function renderHome() {
+    data = loadData() || getDefaultData();
+    var totalWords = data.vocab.length;
+    var learned = data.vocab.filter(function(v) { return v.mastery >= 3; }).length;
+    var pct = totalWords > 0 ? Math.round(learned / totalWords * 100) : 0;
+
+    // Ring
+    var ring = document.getElementById('ringCircle');
+    var circum = 245;
+    var offset = circum - (circum * pct / 100);
+    ring.style.strokeDashoffset = offset;
+    document.getElementById('ringPct').textContent = pct + '%';
+
+    // Today
+    var todayStr = new Date().toISOString().split('T')[0];
+    var todayCi = (data.checkins || []).filter(function(c) { return c.date === todayStr; });
+    var todayWords = todayCi.reduce(function(s, c) { return s + (c.words || 0); }, 0);
+    var todayMin = todayCi.reduce(function(s, c) { return s + (c.minutes || 0); }, 0);
+    document.getElementById('todayWords').textContent = todayWords;
+    document.getElementById('todayBar').style.width = Math.min(100, Math.round(todayWords / 75 * 100)) + '%';
+
+    // Stats
+    document.getElementById('statVocab').textContent = learned;
+    document.getElementById('statNew').textContent = todayWords;
+    document.getElementById('statMinutes').textContent = todayMin;
+    var uniqueDays = new Set((data.checkins || []).map(function(c) { return c.date; })).size;
+    document.getElementById('statDays').textContent = uniqueDays;
+
+    // Plan
+    var planPct = Math.min(100, Math.round(learned / Math.max(1, totalWords) * 100));
+    document.getElementById('planFill').style.width = planPct + '%';
+    document.getElementById('planPct').textContent = planPct + '%';
+}
+
+// ==================== Spell page ====================
+var spellInputs = [];
+var currentWordIdx = 0;
+var spellRevealed = false;
+
+function loadSpellWord() {
+    data = loadData() || getDefaultData();
+    spellRevealed = false;
+    spellInputs = [];
+    var idx = data.spellIndex || 0;
+    if (idx >= data.vocab.length) idx = 0;
+    currentWordIdx = idx;
+    var w = data.vocab[idx];
+
+    document.getElementById('spellWord').textContent = '?'.repeat(w.word.length);
+    document.getElementById('spellPhonetic').textContent = w.phonetic || '';
+    document.getElementById('spellTag').textContent = w.tag || '';
+    document.getElementById('spellCat').textContent = w.cat || '';
+    document.getElementById('spellDef').textContent = w.meaning;
+    document.getElementById('spellExEn').innerHTML = (w.exEn || '').replace(new RegExp(w.word, 'gi'), '<b>' + w.word + '</b>');
+    document.getElementById('spellExCn').textContent = w.exCn || '';
+
+    // Build input boxes
+    var grid = document.getElementById('inputGrid');
+    grid.innerHTML = '';
+    for (var i = 0; i < w.word.length; i++) {
+        var box = document.createElement('div');
+        box.className = 'input-box';
+        box.dataset.idx = i;
+        grid.appendChild(box);
+        spellInputs.push({el: box, char: '', expected: w.word[i].toLowerCase()});
+    }
+}
+
+// Virtual keyboard
+var currentInputPos = 0;
+function setInputChar(idx, ch) {
+    if (idx < 0 || idx >= spellInputs.length) return;
+    spellInputs[idx].char = ch.toLowerCase();
+    spellInputs[idx].el.textContent = ch.toLowerCase();
+    spellInputs[idx].el.classList.add('filled');
+}
+
+function clearInputs() {
+    spellInputs.forEach(function(s) {
+        s.char = ''; s.el.textContent = '';
+        s.el.className = 'input-box';
+    });
+    currentInputPos = 0;
+}
+
+document.querySelectorAll('.kb-key').forEach(function(key) {
+    key.addEventListener('click', function() {
+        var k = key.dataset.key;
+        if (k === 'back') {
+            if (currentInputPos > 0) {
+                currentInputPos--;
+                spellInputs[currentInputPos].char = '';
+                spellInputs[currentInputPos].el.textContent = '';
+                spellInputs[currentInputPos].el.className = 'input-box';
             }
-            applyBgBtn.addEventListener('click', function() {
-                var url = bgUrlInput.value.trim();
-                if (url) setBgImage(url);
-            });
-            bgUrlInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') { applyBgBtn.click(); }
-            });
-
-            // 预设壁纸按钮
-            presetBtns.forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    var url = btn.getAttribute('data-url');
-                    bgUrlInput.value = url;
-                    setBgImage(url);
-                });
-            });
-
-            // 文件上传（备用）
-            bgUpload.addEventListener('change', function(e) {
-                var file = this.files[0];
-                if (file) {
-                    var reader = new FileReader();
-                    reader.onload = function(loadEvent) {
-                        var dataUrl = loadEvent.target.result;
-                        bgUrlInput.value = dataUrl;
-                        setBgImage(dataUrl);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // 恢复上次保存的背景
-            (function() {
-                try {
-                    var saved = localStorage.getItem('cet4-bg-url');
-                    if (saved) { bgUrlInput.value = saved; setBgImage(saved); }
-                } catch(e) {}
-            })();
-
-            opacityRange.addEventListener('input', function() {
-                const val = this.value;
-                opacityValue.textContent = val;
-                root.style.setProperty('--glass-card-bg', 'rgba(255, 255, 255, ' + val + ')');
-            });
-
-            // 6. 导航栏透明度
-            navOpacityRange.addEventListener('input', function() {
-                const val = this.value;
-                navOpacityValue.textContent = val;
-                root.style.setProperty('--nav-bg', 'rgba(255, 255, 255, ' + val + ')');
-            });
-
-            // 7. 导航栏模糊度
-            navBlurRange.addEventListener('input', function() {
-                const val = this.value;
-                navBlurValue.innerHTML = val + '<span style="font-size:10px">px</span>';
-                root.style.setProperty('--nav-blur', val + 'px');
-            });
-
-            // 初始化导航栏默认值
-            root.style.setProperty('--nav-bg', 'rgba(255, 255, 255, 0.72)');
-            root.style.setProperty('--nav-blur', '22px');
-            root.style.setProperty('--glass-card-bg', 'rgba(255, 255, 255, 0.35)');
-        })();
-
-        function toggleActive(element) {
-            if(element.classList.contains('active')) {
-                element.classList.remove('active');
-            } else {
-                document.querySelectorAll('.func-item').forEach(item => {
-                    item.classList.remove('active');
-                });
-                element.classList.add('active');
+        } else if (k === 'enter') {
+            checkSpelling();
+        } else {
+            if (currentInputPos < spellInputs.length) {
+                setInputChar(currentInputPos, k);
+                currentInputPos++;
             }
         }
-    </script>
+    });
+});
 
-    <!-- PWA: 注册 Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').then(function(reg) {
-                console.log('SW registered:', reg.scope);
-            }).catch(function(err) {
-                console.log('SW failed:', err);
-            });
+document.getElementById('btnClear').addEventListener('click', clearInputs);
+
+document.getElementById('btnCheck').addEventListener('click', checkSpelling);
+
+// Hint: reveal one letter
+document.getElementById('btnHint').addEventListener('click', function() {
+    if (spellRevealed) return;
+    for (var i = 0; i < spellInputs.length; i++) {
+        if (!spellInputs[i].char) {
+            setInputChar(i, spellInputs[i].expected);
+            currentInputPos = Math.max(currentInputPos, i + 1);
+            break;
         }
-    </script>
+    }
+});
+
+// Speak
+document.getElementById('btnSpeak').addEventListener('click', function() {
+    data = loadData() || getDefaultData();
+    var w = data.vocab[currentWordIdx];
+    if (w && window.speechSynthesis) {
+        var u = new SpeechSynthesisUtterance(w.word);
+        u.lang = 'en-US'; u.rate = 0.8;
+        speechSynthesis.speak(u);
+    }
+});
+
+function checkSpelling() {
+    data = loadData() || getDefaultData();
+    var w = data.vocab[currentWordIdx];
+    var allCorrect = true;
+    var hasInput = false;
+
+    spellInputs.forEach(function(s) {
+        if (s.char) { hasInput = true; }
+        if (s.char === s.expected) {
+            s.el.className = 'input-box correct';
+        } else if (s.char) {
+            s.el.className = 'input-box wrong';
+            allCorrect = false;
+        } else {
+            allCorrect = false;
+        }
+    });
+
+    if (!hasInput) { toastMsg('请先输入字母'); return; }
+
+    // Show word
+    if (!allCorrect || !spellRevealed) {
+        document.getElementById('spellWord').textContent = w.word;
+        spellRevealed = true;
+    }
+
+    // Show feedback modal
+    document.getElementById('feedbackWordName').textContent = w.word;
+    var overlay = document.getElementById('feedbackOverlay');
+    overlay.classList.add('show');
+
+    // Feedback buttons
+    overlay.querySelectorAll('.f-btn').forEach(function(btn) {
+        btn.onclick = function() {
+            var fb = btn.dataset.fb;
+            if (fb === 'remember') w.mastery = Math.min(3, w.mastery + 2);
+            else if (fb === 'vague') w.mastery = Math.max(0, Math.min(3, w.mastery + 1));
+            else w.mastery = Math.max(0, w.mastery - 1);
+            data.vocab[currentWordIdx] = w;
+
+            // Record checkin
+            var todayStr = new Date().toISOString().split('T')[0];
+            var todayCi = data.checkins.filter(function(c) { return c.date === todayStr; });
+            if (todayCi.length === 0) { data.checkins.push({date: todayStr, words: 1, minutes: 0}); }
+            else { todayCi[0].words = (todayCi[0].words || 0) + 1; }
+
+            data.spellIndex = currentWordIdx + 1;
+            saveData(data);
+            overlay.classList.remove('show');
+
+            // Next word
+            loadSpellWord();
+            clearInputs();
+            toastMsg(fb === 'remember' ? '✅ 记住了！' : fb === 'vague' ? '📝 标记为模糊' : '🔄 标记为忘记');
+        };
+    });
+}
+
+// ==================== Grammar page ====================
+function renderGrammar() {
+    data = loadData() || getDefaultData();
+    var list = document.getElementById('grammarList');
+    var items = data.grammar || [];
+    list.innerHTML = items.map(function(g, i) {
+        return '<div class="glass-card-sm grammar-item">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center">' +
+            '<h4>' + esc(g.title) + ' <span class="g-tag">' + esc(g.tag || '') + '</span></h4>' +
+            '<button onclick="deleteGrammar(' + i + ')" style="background:none;border:none;color:var(--color-forget);cursor:pointer;font-size:16px"><i class="fas fa-times"></i></button>' +
+            '</div>' +
+            (g.ex ? '<div class="g-ex">📌 ' + esc(g.ex) + '</div>' : '') +
+            '</div>';
+    }).join('');
+}
+
+function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function deleteGrammar(i) {
+    data = loadData() || getDefaultData();
+    data.grammar.splice(i, 1);
+    saveData(data);
+    renderGrammar();
+}
+
+document.getElementById('btnAddGrammar').addEventListener('click', function() {
+    data = loadData() || getDefaultData();
+    var title = document.getElementById('gTitle').value.trim();
+    var tag = document.getElementById('gTag').value.trim();
+    var ex = document.getElementById('gEx').value.trim();
+    if (!title) { toastMsg('请输入语法点名称'); return; }
+    data.grammar.unshift({id: Date.now(), title: title, tag: tag, ex: ex});
+    saveData(data);
+    document.getElementById('gTitle').value = '';
+    document.getElementById('gTag').value = '';
+    document.getElementById('gEx').value = '';
+    renderGrammar();
+    toastMsg('✅ 已添加');
+});
+
+// ==================== Settings ====================
+var settingsPanel = document.getElementById('settingsPanel');
+document.getElementById('btnOpenSettings').addEventListener('click', function() { settingsPanel.classList.add('open'); });
+document.getElementById('btnCloseSettings').addEventListener('click', function() { settingsPanel.classList.remove('open'); });
+settingsPanel.addEventListener('click', function(e) { if (e.target === settingsPanel) settingsPanel.classList.remove('open'); });
+
+// Restore settings UI
+function restoreSettingsUI() {
+    data = loadData() || getDefaultData();
+    settings = data.settings || {};
+    document.getElementById('setTextColor').value = settings.textColor || '#f5f5f5';
+    document.getElementById('setGlassOpacity').value = settings.glassOpacity !== undefined ? settings.glassOpacity : 0.08;
+    document.getElementById('valGlassOpacity').textContent = (settings.glassOpacity !== undefined ? settings.glassOpacity : 0.08);
+    document.getElementById('setGlassBlur').value = settings.glassBlur || 20;
+    document.getElementById('valGlassBlur').textContent = (settings.glassBlur || 20) + 'px';
+    document.getElementById('setNavOpacity').value = settings.navOpacity !== undefined ? settings.navOpacity : 0.12;
+    document.getElementById('valNavOpacity').textContent = (settings.navOpacity !== undefined ? settings.navOpacity : 0.12);
+    document.getElementById('setNavBlur').value = settings.navBlur || 24;
+    document.getElementById('valNavBlur').textContent = (settings.navBlur || 24) + 'px';
+    document.getElementById('setWallpaperUrl').value = settings.wallpaperUrl || '';
+    document.getElementById('setWallpaperBrightness').value = settings.wallpaperBrightness !== undefined ? settings.wallpaperBrightness : 0.4;
+    document.getElementById('valWallpaperBrightness').textContent = settings.wallpaperBrightness !== undefined ? settings.wallpaperBrightness : 0.4;
+}
+
+settingsPanel.addEventListener('transitionend', function() {
+    if (settingsPanel.classList.contains('open')) restoreSettingsUI();
+});
+
+// Settings event handlers
+document.getElementById('setTextColor').addEventListener('input', function() {
+    root.style.setProperty('--text-primary', this.value);
+    settings.textColor = this.value; data.settings = settings; saveData(data);
+});
+document.getElementById('setGlassOpacity').addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    root.style.setProperty('--glass-bg', 'rgba(255,255,255,' + v + ')');
+    document.getElementById('valGlassOpacity').textContent = v;
+    settings.glassOpacity = v; data.settings = settings; saveData(data);
+});
+document.getElementById('setGlassBlur').addEventListener('input', function() {
+    root.style.setProperty('--glass-blur', this.value + 'px');
+    document.getElementById('valGlassBlur').textContent = this.value + 'px';
+    settings.glassBlur = parseInt(this.value); data.settings = settings; saveData(data);
+});
+document.getElementById('setNavOpacity').addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    root.style.setProperty('--nav-bg', 'rgba(255,255,255,' + v + ')');
+    document.getElementById('valNavOpacity').textContent = v;
+    settings.navOpacity = v; data.settings = settings; saveData(data);
+});
+document.getElementById('setNavBlur').addEventListener('input', function() {
+    root.style.setProperty('--nav-blur', this.value + 'px');
+    document.getElementById('valNavBlur').textContent = this.value + 'px';
+    settings.navBlur = parseInt(this.value); data.settings = settings; saveData(data);
+});
+document.getElementById('setWallpaperBrightness').addEventListener('input', function() {
+    root.style.setProperty('--wallpaper-brightness', this.value);
+    document.getElementById('valWallpaperBrightness').textContent = this.value;
+    settings.wallpaperBrightness = parseFloat(this.value); data.settings = settings; saveData(data);
+});
+
+function setWallpaper(url) {
+    if (url) {
+        root.style.setProperty('--bg-image', 'url(' + url + ')');
+        document.body.classList.add('has-wallpaper');
+    } else {
+        root.style.setProperty('--bg-image', 'none');
+        document.body.classList.remove('has-wallpaper');
+    }
+    settings.wallpaperUrl = url || ''; data.settings = settings; saveData(data);
+}
+document.getElementById('btnApplyWallpaper').addEventListener('click', function() {
+    setWallpaper(document.getElementById('setWallpaperUrl').value.trim());
+});
+document.querySelectorAll('.preset-dot').forEach(function(dot) {
+    dot.addEventListener('click', function() {
+        var url = dot.dataset.wp;
+        document.getElementById('setWallpaperUrl').value = url;
+        setWallpaper(url);
+    });
+});
+
+// ==================== Toast ====================
+var toastTimer;
+function toastMsg(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { t.classList.remove('show'); }, 1800);
+}
+
+// ==================== Init ====================
+renderHome();
+
+// PWA: Register Service Worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
 </body>
 </html>
