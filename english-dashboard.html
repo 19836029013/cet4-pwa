@@ -218,6 +218,30 @@
         .action-btn:active { transform: scale(0.96); }
 
         /* ============================
+           单词列表页
+           ============================ */
+        .list-stats { display: flex; justify-content: space-around; padding: 14px 10px; margin-bottom: 14px; }
+        .list-stats .ls-item { text-align: center; }
+        .list-stats .ls-item .num { font-size: 22px; font-weight: 700; display: block; margin-bottom: 2px; }
+        .list-stats .ls-item .label { font-size: 11px; color: var(--text-secondary); }
+
+        .list-wrapper { flex: 1; min-height: 0; overflow: hidden; border-radius: var(--card-radius); position: relative; }
+        .list-card-inner { height: 100%; width: 100%; padding: 4px 0; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+        .list-card-inner::-webkit-scrollbar { display: none; }
+
+        .word-item { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.15s; cursor: pointer; }
+        .word-item:last-child { border-bottom: none; }
+        .word-item:active { background: rgba(255,255,255,0.03); }
+        .word-item .wi-left { flex: 1; min-width: 0; }
+        .word-item .wi-left .wi-word { font-size: 16px; font-weight: 700; display: block; margin-bottom: 2px; }
+        .word-item .wi-left .wi-phonetic { font-size: 13px; color: var(--text-secondary); display: block; }
+        .word-item .wi-mid { width: 32px; flex-shrink: 0; display: flex; justify-content: center; }
+        .word-item .wi-mid .wi-sound { width: 28px; height: 28px; background: rgba(255,255,255,0.08); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 11px; color: var(--text-secondary); }
+        .word-item .wi-right { flex: 1.2; min-width: 0; display: flex; align-items: center; justify-content: space-between; padding-left: 8px; }
+        .word-item .wi-right .wi-meaning { font-size: 14px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .word-item .wi-right .wi-arrow { color: rgba(255,255,255,0.25); font-size: 14px; flex-shrink: 0; margin-left: 4px; }
+
+        /* ============================
            弹窗 / Overlays
            ============================ */
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
@@ -277,13 +301,13 @@
         /* ============================
            底部导航
            ============================ */
-        .bottom-nav { background: var(--nav-bg); backdrop-filter: blur(var(--nav-blur)); -webkit-backdrop-filter: blur(var(--nav-blur)); border-top: 1px solid var(--glass-border); padding: 6px 0 calc(6px + env(safe-area-inset-bottom)); display: flex; justify-content: space-evenly; align-items: center; flex-shrink: 0; position: relative; z-index: 50; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: var(--text-secondary); font-size: 10px; padding: 4px 0; }
+        .bottom-nav { margin: 8px 16px calc(8px + env(safe-area-inset-bottom)); background: var(--nav-bg); backdrop-filter: blur(var(--nav-blur)); -webkit-backdrop-filter: blur(var(--nav-blur)); border: 1px solid var(--glass-border); border-radius: 30px; padding: 6px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; z-index: 50; position: relative; height: 60px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; color: var(--text-secondary); font-size: 10px; padding: 0; }
         .nav-item i { font-size: 22px; color: var(--text-secondary); transition: color 0.2s; }
         .nav-item.active i { color: #fff; }
         .nav-item.active span { color: #fff; }
-        .nav-item.middle { position: relative; top: -10px; }
-        .nav-item.middle i { background: #fff; color: #333; padding: 11px; border-radius: 50%; box-shadow: 0 4px 12px rgba(0,0,0,0.4); font-size: 20px; }
+        .center-btn { width: 48px; height: 48px; background: #fff; color: #1e1e1e; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.4); margin-top: -18px; cursor: pointer; }
+        .center-btn i { color: inherit; }
 
         /* ============================
            提示条
@@ -334,7 +358,7 @@
             </div>
 
             <div class="grid-menu">
-                <div class="glass-card-sm menu-item" data-action="spell"><div class="icon-box"><i class="fas fa-font"></i></div><span>单词</span></div>
+                <div class="glass-card-sm menu-item" data-action="wordlist"><div class="icon-box"><i class="fas fa-font"></i></div><span>单词</span></div>
                 <div class="glass-card-sm menu-item" data-action="grammar"><div class="icon-box"><i class="fas fa-list-ul"></i></div><span>语法</span></div>
                 <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-quote-right"></i></div><span>词组</span></div>
                 <div class="glass-card-sm menu-item"><div class="icon-box"><i class="fas fa-pen-fancy"></i></div><span>读写</span></div>
@@ -425,6 +449,28 @@
         </div>
     </div>
 
+    <!-- ================= 单词列表页 ================= -->
+    <div id="page-wordlist" class="page">
+        <div class="content-area">
+            <div class="spell-nav">
+                <div class="back-btn" id="btnBackHomeFromList"><i class="fas fa-chevron-left"></i></div>
+                <span class="s-title">今日单词</span>
+                <div class="s-actions"><i class="far fa-calendar-alt"></i></div>
+            </div>
+
+            <div class="glass-card list-stats" id="listStats">
+                <div class="ls-item"><span class="num" id="lsTotal">45</span><span class="label">今日单词</span></div>
+                <div class="ls-item"><span class="num" id="lsMastered">32</span><span class="label">已掌握</span></div>
+                <div class="ls-item"><span class="num" id="lsVague">10</span><span class="label">模糊</span></div>
+                <div class="ls-item"><span class="num" id="lsForgot">3</span><span class="label">忘记</span></div>
+            </div>
+
+            <div class="list-wrapper glass-card">
+                <div class="list-card-inner" id="wordListInner"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ================= 语法笔记本页 ================= -->
     <div id="page-grammar" class="page">
         <div class="content-area">
@@ -446,8 +492,8 @@
     <!-- ================= 底部导航 ================= -->
     <div class="bottom-nav">
         <div class="nav-item active" data-nav="home"><i class="fas fa-home"></i><span>首页</span></div>
-        <div class="nav-item" data-nav="spell"><i class="fas fa-font"></i><span>单词</span></div>
-        <div class="nav-item middle" data-nav="home"><i class="fas fa-cube"></i></div>
+        <div class="nav-item" data-nav="wordlist"><i class="fas fa-font"></i><span>单词</span></div>
+        <div class="center-btn" data-nav="home"><i class="fas fa-cube"></i></div>
         <div class="nav-item" data-nav="grammar"><i class="fas fa-list-ul"></i><span>语法</span></div>
         <div class="nav-item" data-nav="home"><i class="fas fa-chart-bar"></i><span>统计</span></div>
     </div>
@@ -595,6 +641,7 @@ function switchPage(name) {
     if (name === 'spell') loadSpellWord();
     if (name === 'grammar') renderGrammar();
     if (name === 'home') renderHome();
+    if (name === 'wordlist') renderWordList();
 }
 
 // Bottom nav click
@@ -602,9 +649,13 @@ document.querySelectorAll('.nav-item').forEach(function(n) {
     n.addEventListener('click', function() { switchPage(n.dataset.nav); });
 });
 
+// Center button
+document.querySelector('.center-btn').addEventListener('click', function() { switchPage('home'); });
+
 // Back buttons
 document.getElementById('btnBackHome').addEventListener('click', function() { switchPage('home'); });
 document.getElementById('btnBackHome2').addEventListener('click', function() { switchPage('home'); });
+document.getElementById('btnBackHomeFromList').addEventListener('click', function() { switchPage('home'); });
 
 // 6-grid menu -> spell page
 document.querySelectorAll('.menu-item[data-action]').forEach(function(m) {
@@ -852,6 +903,41 @@ document.getElementById('btnAddGrammar').addEventListener('click', function() {
     renderGrammar();
     toastMsg('✅ 已添加');
 });
+
+// ==================== Word List page ====================
+function renderWordList() {
+    data = loadData() || getDefaultData();
+    var vocab = data.vocab || [];
+
+    // Stats
+    var mastered = vocab.filter(function(v) { return v.mastery >= 3; }).length;
+    var vague = vocab.filter(function(v) { return v.mastery === 1 || v.mastery === 2; }).length;
+    var forgot = vocab.filter(function(v) { return v.mastery <= 0; }).length;
+    document.getElementById('lsTotal').textContent = vocab.length;
+    document.getElementById('lsMastered').textContent = mastered;
+    document.getElementById('lsVague').textContent = vague;
+    document.getElementById('lsForgot').textContent = forgot;
+
+    // List
+    var listEl = document.getElementById('wordListInner');
+    listEl.innerHTML = vocab.map(function(w, i) {
+        return '<div class="word-item" data-widx="' + i + '">' +
+            '<div class="wi-left"><span class="wi-word">' + esc(w.word) + '</span><span class="wi-phonetic">' + esc(w.phonetic || '') + '</span></div>' +
+            '<div class="wi-mid"><div class="wi-sound"><i class="fas fa-volume-up"></i></div></div>' +
+            '<div class="wi-right"><span class="wi-meaning">' + esc((w.tag||'') + ' ' + w.meaning) + '</span><span class="wi-arrow"><i class="fas fa-chevron-right"></i></span></div>' +
+            '</div>';
+    }).join('') + '<div style="height:8px;"></div>';
+
+    // Click → spell page for that word
+    listEl.querySelectorAll('.word-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            var wi = parseInt(item.dataset.widx);
+            data.spellIndex = wi;
+            saveData(data);
+            switchPage('spell');
+        });
+    });
+}
 
 // ==================== Settings ====================
 var settingsPanel = document.getElementById('settingsPanel');
