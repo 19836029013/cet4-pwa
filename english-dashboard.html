@@ -28,6 +28,7 @@
             --card-shadow: 0 8px 32px rgba(0,0,0,0.5);
             --text-primary: #f5f5f5;
             --text-secondary: #b0b0b0;
+            --text-placeholder: rgba(255, 255, 255, 0.2);
             --text-highlight: #4da6ff;
             --color-remember: #4caf50;
             --color-vague: #a1887f;
@@ -161,46 +162,60 @@
         .task-row .done .t-icon { color: var(--color-remember); }
 
         /* ============================
-           拼写页
+           拼写页 — 精确UI
            ============================ */
-        .top-nav { display: flex; justify-content: space-between; align-items: center; padding: 4px 0 10px; }
-        .top-nav .title { font-size: 18px; font-weight: 600; }
-        .top-nav .back-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .spell-nav { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px 12px 4px; }
+        .spell-nav .back-btn { font-size: 22px; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+        .spell-nav .s-title { font-size: 18px; font-weight: 600; }
+        .spell-nav .s-actions { display: flex; gap: 14px; font-size: 18px; color: var(--text-secondary); }
+        .spell-nav .s-actions i { cursor: pointer; }
 
-        .word-detail-card { padding: 16px; margin-bottom: 14px; }
-        .word-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-        .word-main { display: flex; align-items: center; gap: 8px; }
-        .word-main h1 { font-size: 26px; font-weight: 700; }
-        .word-tag { font-size: 10px; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 12px; color: var(--text-secondary); }
-        .pronunciation { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-secondary); margin-bottom: 10px; }
-        .btn-sound { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 11px; cursor: pointer; }
-        .def { font-size: 14px; margin-bottom: 10px; }
-        .example-box { border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
-        .example-box .en { font-size: 13px; margin-bottom: 4px; }
+        .word-card { padding: 20px 16px; margin-bottom: 14px; }
+        .word-card .w-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .word-card .w-main { display: flex; align-items: center; gap: 10px; }
+        .word-card .w-main h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; }
+        .word-card .w-main .w-speak { font-size: 18px; color: var(--text-secondary); cursor: pointer; }
+        .badge { font-size: 10px; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 12px; color: var(--text-secondary); white-space: nowrap; }
+
+        .phonetic-row { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--text-secondary); margin-bottom: 10px; }
+        .sound-btn { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-size: 10px; color: #fff; cursor: pointer; flex-shrink: 0; }
+        .w-count { margin-left: auto; font-size: 12px; color: var(--text-secondary); }
+
+        .definition { font-size: 15px; margin-bottom: 12px; }
+
+        .example-box { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px; margin-top: 4px; position: relative; }
+        .example-box .en { font-size: 14px; line-height: 1.5; margin-bottom: 4px; }
         .example-box .en b { color: #fff; }
         .example-box .cn { font-size: 12px; color: var(--text-secondary); }
+        .example-box .ex-speak { position: absolute; right: 0; top: 12px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
 
-        .spell-area { padding: 8px 0; flex: 1; display: flex; flex-direction: column; justify-content: flex-end; }
-        .spell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .morph-box { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); font-size: 12px; color: var(--text-secondary); }
+
+        .spell-card { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        .spell-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
         .spell-header h4 { font-size: 16px; font-weight: 600; }
-        .spell-header .hint { font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+        .spell-header .hint { font-size: 13px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        .spell-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
 
-        .input-grid { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
-        .input-box { width: 30px; height: 38px; border-bottom: 2px solid rgba(255,255,255,0.2); display: flex; justify-content: center; align-items: center; font-size: 17px; font-weight: 600; border-radius: 3px; transition: all 0.2s; }
-        .input-box.filled { border-color: #fff; background: rgba(255,255,255,0.05); }
-        .input-box.correct { border-color: var(--color-remember); background: rgba(76,175,80,0.15); }
-        .input-box.wrong { border-color: var(--color-forget); background: rgba(244,67,54,0.15); }
+        .input-grid { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+        .input-box { width: 30px; height: 42px; display: flex; justify-content: center; align-items: center; font-size: 18px; font-weight: 600; border-radius: 6px; transition: all 0.15s; }
+        .input-box.empty { border: 1px dashed var(--text-placeholder); color: var(--text-placeholder); }
+        .input-box.filled { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; }
+        .input-box.correct { border: 1px solid var(--color-remember); background: rgba(76,175,80,0.15); color: var(--color-remember); }
+        .input-box.wrong { border: 1px solid var(--color-forget); background: rgba(239,83,80,0.15); color: var(--color-forget); }
 
-        .kb-row { display: flex; gap: 5px; justify-content: center; margin-bottom: 5px; }
-        .kb-key { min-width: 28px; height: 38px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 15px; color: var(--text-primary); cursor: pointer; transition: all 0.1s; flex: 1; max-width: 34px; }
-        .kb-key:active { transform: scale(0.9); background: rgba(255,255,255,0.3); }
-        .kb-key.special { background: rgba(255,255,255,0.05); flex: 1.8; max-width: 54px; }
+        .keyboard-area { margin-bottom: 6px; }
+        .kb-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 6px; }
+        .kb-key { min-width: 28px; height: 42px; background: rgba(255,255,255,0.12); border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 15px; color: var(--text-primary); cursor: pointer; transition: 0.1s; flex: 1; max-width: 36px; user-select: none; }
+        .kb-key:active { transform: scale(0.92); background: rgba(255,255,255,0.25); }
+        .kb-key.special { background: rgba(255,255,255,0.05); flex: 1.5; max-width: 48px; font-size: 13px; }
+        .kb-key.backspace-icon { font-size: 14px; color: var(--text-secondary); }
 
-        .action-row { display: flex; gap: 10px; margin-top: 8px; }
-        .action-btn { flex: 1; padding: 10px; border-radius: var(--card-radius); text-align: center; font-weight: 500; font-size: 14px; border: none; cursor: pointer; }
+        .action-row { display: flex; gap: 12px; margin-top: auto; }
+        .action-btn { flex: 1; padding: 12px; border-radius: var(--card-radius); text-align: center; font-weight: 500; font-size: 14px; border: none; cursor: pointer; transition: 0.15s; }
         .action-btn.clear { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
         .action-btn.check { background: rgba(255,255,255,0.2); color: #fff; }
-        .action-btn.check:active { background: rgba(255,255,255,0.3); }
+        .action-btn:active { transform: scale(0.96); }
 
         /* ============================
            弹窗 / Overlays
@@ -350,39 +365,60 @@
     <!-- ================= 拼写页 ================= -->
     <div id="page-spell" class="page">
         <div class="content-area">
-            <div class="top-nav">
+            <div class="spell-nav">
                 <div class="back-btn" id="btnBackHome"><i class="fas fa-chevron-left"></i></div>
-                <span class="title">单词拼写</span>
-                <div class="word-tag" id="spellCat">核心词汇</div>
+                <span class="s-title">单词</span>
+                <div class="s-actions"><i class="far fa-star" id="btnStar"></i><i class="fas fa-ellipsis-h"></i></div>
             </div>
 
-            <div class="glass-card word-detail-card" id="wordCard">
-                <div class="word-header">
-                    <div class="word-main">
+            <div class="glass-card word-card">
+                <div class="w-header">
+                    <div class="w-main">
                         <h1 id="spellWord">ambitious</h1>
-                        <i class="fas fa-volume-up" style="cursor:pointer;opacity:0.7;" id="btnSpeak"></i>
+                        <i class="fas fa-volume-up w-speak" id="btnSpeak"></i>
                     </div>
-                    <div class="word-tag" id="spellTag">adj.</div>
+                    <div class="badge" id="spellCat">四级核心词汇</div>
                 </div>
-                <div class="pronunciation" id="spellPhonetic">/æmˈbɪʃəs/</div>
-                <div class="def" id="spellDef">有雄心的；有野心的；有抱负的</div>
+                <div class="phonetic-row">
+                    <span id="spellPhonetic">/æmˈbɪʃəs/</span>
+                    <div class="sound-btn" id="btnSoundUK">英 <i class="fas fa-volume-up"></i></div>
+                    <div class="sound-btn" id="btnSoundUS">美 <i class="fas fa-volume-up"></i></div>
+                    <div class="w-count" id="spellProgress">1 / 10</div>
+                </div>
+                <div class="definition" id="spellDef">adj. 有雄心的；有野心的；有抱负的</div>
                 <div class="example-box">
                     <div class="en" id="spellExEn">She is an <b>ambitious</b> young woman with a clear goal.</div>
                     <div class="cn" id="spellExCn">她是一位有抱负的年轻女性，有着明确的目标。</div>
+                    <div class="ex-speak" id="btnExSpeak"><i class="fas fa-volume-up"></i></div>
                 </div>
+                <div class="morph-box" id="spellMorph"></div>
             </div>
 
-            <div class="spell-area">
+            <div class="glass-card spell-card">
                 <div class="spell-header">
                     <h4>拼写练习</h4>
                     <div class="hint" id="btnHint"><i class="far fa-lightbulb"></i> 提示</div>
                 </div>
+                <div class="spell-sub">请拼写出正确的单词</div>
+
                 <div class="input-grid" id="inputGrid"></div>
-                <div class="kb-row"><div class="kb-key" data-key="q">q</div><div class="kb-key" data-key="w">w</div><div class="kb-key" data-key="e">e</div><div class="kb-key" data-key="r">r</div><div class="kb-key" data-key="t">t</div><div class="kb-key" data-key="y">y</div><div class="kb-key" data-key="u">u</div><div class="kb-key" data-key="i">i</div><div class="kb-key" data-key="o">o</div><div class="kb-key" data-key="p">p</div></div>
-                <div class="kb-row"><div class="kb-key" data-key="a">a</div><div class="kb-key" data-key="s">s</div><div class="kb-key" data-key="d">d</div><div class="kb-key" data-key="f">f</div><div class="kb-key" data-key="g">g</div><div class="kb-key" data-key="h">h</div><div class="kb-key" data-key="j">j</div><div class="kb-key" data-key="k">k</div><div class="kb-key" data-key="l">l</div></div>
-                <div class="kb-row"><div class="kb-key special" data-key="back"><i class="fas fa-backspace"></i></div><div class="kb-key" data-key="z">z</div><div class="kb-key" data-key="x">x</div><div class="kb-key" data-key="c">c</div><div class="kb-key" data-key="v">v</div><div class="kb-key" data-key="b">b</div><div class="kb-key" data-key="n">n</div><div class="kb-key" data-key="m">m</div><div class="kb-key special" data-key="enter">确认</div></div>
+
+                <div class="keyboard-area">
+                    <div class="kb-row">
+                        <div class="kb-key" data-key="q">q</div><div class="kb-key" data-key="w">w</div><div class="kb-key" data-key="e">e</div><div class="kb-key" data-key="r">r</div><div class="kb-key" data-key="t">t</div><div class="kb-key" data-key="y">y</div><div class="kb-key" data-key="u">u</div><div class="kb-key" data-key="i">i</div><div class="kb-key" data-key="o">o</div><div class="kb-key" data-key="p">p</div>
+                    </div>
+                    <div class="kb-row">
+                        <div class="kb-key" data-key="a">a</div><div class="kb-key" data-key="s">s</div><div class="kb-key" data-key="d">d</div><div class="kb-key" data-key="f">f</div><div class="kb-key" data-key="g">g</div><div class="kb-key" data-key="h">h</div><div class="kb-key" data-key="j">j</div><div class="kb-key" data-key="k">k</div><div class="kb-key" data-key="l">l</div>
+                    </div>
+                    <div class="kb-row">
+                        <div class="kb-key special" data-key="shift"><i class="fas fa-arrow-up"></i></div>
+                        <div class="kb-key" data-key="z">z</div><div class="kb-key" data-key="x">x</div><div class="kb-key" data-key="c">c</div><div class="kb-key" data-key="v">v</div><div class="kb-key" data-key="b">b</div><div class="kb-key" data-key="n">n</div><div class="kb-key" data-key="m">m</div>
+                        <div class="kb-key special backspace-icon" data-key="back"><i class="fas fa-backspace"></i></div>
+                    </div>
+                </div>
+
                 <div class="action-row">
-                    <button class="action-btn clear" id="btnClear">清空</button>
+                    <button class="action-btn clear" id="btnClear"><i class="fas fa-undo-alt"></i> 清空</button>
                     <button class="action-btn check" id="btnCheck">检查</button>
                 </div>
             </div>
@@ -503,16 +539,16 @@ function saveData(d) { try { localStorage.setItem(STORE_KEY, JSON.stringify(d));
 function getDefaultData() {
     return {
         vocab: [
-            {word:'ambitious',meaning:'有雄心的；有野心的',phonetic:'/æmˈbɪʃəs/',tag:'adj.',exEn:'She is an ambitious young woman with a clear goal.',exCn:'她是一位有抱负的年轻女性，有着明确的目标。',cat:'核心词汇',mastery:0},
-            {word:'experience',meaning:'经验；经历',phonetic:'/ɪkˈspɪriəns/',tag:'n./v.',exEn:'This job requires a lot of experience.',exCn:'这份工作需要很多经验。',cat:'四级高频',mastery:0},
-            {word:'environment',meaning:'环境',phonetic:'/ɪnˈvaɪrənmənt/',tag:'n.',exEn:'We must protect the environment.',exCn:'我们必须保护环境。',cat:'四级高频',mastery:0},
-            {word:'technology',meaning:'技术',phonetic:'/tekˈnɒlədʒi/',tag:'n.',exEn:'Technology changes our lives every day.',exCn:'科技每天都在改变我们的生活。',cat:'四级高频',mastery:0},
-            {word:'communicate',meaning:'交流；沟通',phonetic:'/kəˈmjuːnɪkeɪt/',tag:'v.',exEn:'We need to communicate better.',exCn:'我们需要更好地沟通。',cat:'四级高频',mastery:0},
-            {word:'opportunity',meaning:'机会',phonetic:'/ˌɒpəˈtjuːnəti/',tag:'n.',exEn:'This is a great opportunity for you.',exCn:'这对你来说是个很好的机会。',cat:'四级高频',mastery:0},
-            {word:'knowledge',meaning:'知识',phonetic:'/ˈnɒlɪdʒ/',tag:'n.',exEn:'Knowledge is power.',exCn:'知识就是力量。',cat:'四级高频',mastery:0},
-            {word:'different',meaning:'不同的',phonetic:'/ˈdɪfərənt/',tag:'adj.',exEn:'They have different opinions.',exCn:'他们有不同的意见。',cat:'四级高频',mastery:0},
-            {word:'important',meaning:'重要的',phonetic:'/ɪmˈpɔːtənt/',tag:'adj.',exEn:'This is an important decision.',exCn:'这是个重要的决定。',cat:'四级高频',mastery:0},
-            {word:'government',meaning:'政府',phonetic:'/ˈɡʌvənmənt/',tag:'n.',exEn:'The government announced a new policy.',exCn:'政府宣布了一项新政策。',cat:'四级高频',mastery:0}
+            {word:'ambitious',meaning:'有雄心的；有野心的',phonetic:'/æmˈbɪʃəs/',tag:'adj.',exEn:'She is an ambitious young woman with a clear goal.',exCn:'她是一位有抱负的年轻女性，有着明确的目标。',cat:'四级核心词汇',mastery:0,morph:'ambition (n. 雄心) ｜ ambitiously (adv. 有雄心地)'},
+            {word:'experience',meaning:'经验；经历',phonetic:'/ɪkˈspɪriəns/',tag:'n./v.',exEn:'This job requires a lot of experience.',exCn:'这份工作需要很多经验。',cat:'四级高频',mastery:0,morph:'experienced (adj. 有经验的)'},
+            {word:'environment',meaning:'环境',phonetic:'/ɪnˈvaɪrənmənt/',tag:'n.',exEn:'We must protect the environment.',exCn:'我们必须保护环境。',cat:'四级高频',mastery:0,morph:'environmental (adj. 环境的)'},
+            {word:'technology',meaning:'技术',phonetic:'/tekˈnɒlədʒi/',tag:'n.',exEn:'Technology changes our lives every day.',exCn:'科技每天都在改变我们的生活。',cat:'四级高频',mastery:0,morph:'technological (adj. 技术的)'},
+            {word:'communicate',meaning:'交流；沟通',phonetic:'/kəˈmjuːnɪkeɪt/',tag:'v.',exEn:'We need to communicate better.',exCn:'我们需要更好地沟通。',cat:'四级高频',mastery:0,morph:'communication (n. 交流)'},
+            {word:'opportunity',meaning:'机会',phonetic:'/ˌɒpəˈtjuːnəti/',tag:'n.',exEn:'This is a great opportunity for you.',exCn:'这对你来说是个很好的机会。',cat:'四级高频',mastery:0,morph:'opportune (adj. 恰好的)'},
+            {word:'knowledge',meaning:'知识',phonetic:'/ˈnɒlɪdʒ/',tag:'n.',exEn:'Knowledge is power.',exCn:'知识就是力量。',cat:'四级高频',mastery:0,morph:'knowledgeable (adj. 博学的)'},
+            {word:'different',meaning:'不同的',phonetic:'/ˈdɪfərənt/',tag:'adj.',exEn:'They have different opinions.',exCn:'他们有不同的意见。',cat:'四级高频',mastery:0,morph:'difference (n. 差异) ｜ differ (v. 不同)'},
+            {word:'important',meaning:'重要的',phonetic:'/ɪmˈpɔːtənt/',tag:'adj.',exEn:'This is an important decision.',exCn:'这是个重要的决定。',cat:'四级高频',mastery:0,morph:'importance (n. 重要性)'},
+            {word:'government',meaning:'政府',phonetic:'/ˈɡʌvənmənt/',tag:'n.',exEn:'The government announced a new policy.',exCn:'政府宣布了一项新政策。',cat:'四级高频',mastery:0,morph:'govern (v. 治理)'}
         ],
         grammar: [
             {id:1,title:'五种基本句型',tag:'句法',ex:'SV / SVO / SVC / SVOO / SVOC — I run. / I love you. / She is beautiful.'},
@@ -627,24 +663,26 @@ function loadSpellWord() {
     currentWordIdx = idx;
     var w = data.vocab[idx];
 
-    document.getElementById('spellWord').textContent = '?'.repeat(w.word.length);
+    document.getElementById('spellWord').textContent = w.word;
     document.getElementById('spellPhonetic').textContent = w.phonetic || '';
-    document.getElementById('spellTag').textContent = w.tag || '';
     document.getElementById('spellCat').textContent = w.cat || '';
-    document.getElementById('spellDef').textContent = w.meaning;
+    document.getElementById('spellDef').textContent = (w.tag ? w.tag + ' ' : '') + w.meaning;
     document.getElementById('spellExEn').innerHTML = (w.exEn || '').replace(new RegExp(w.word, 'gi'), '<b>' + w.word + '</b>');
     document.getElementById('spellExCn').textContent = w.exCn || '';
+    document.getElementById('spellMorph').textContent = w.morph || '';
+    document.getElementById('spellProgress').textContent = (idx + 1) + ' / ' + data.vocab.length;
 
-    // Build input boxes
+    // Build input boxes (start as empty with dashed border)
     var grid = document.getElementById('inputGrid');
     grid.innerHTML = '';
     for (var i = 0; i < w.word.length; i++) {
         var box = document.createElement('div');
-        box.className = 'input-box';
+        box.className = 'input-box empty';
         box.dataset.idx = i;
         grid.appendChild(box);
         spellInputs.push({el: box, char: '', expected: w.word[i].toLowerCase()});
     }
+    currentInputPos = 0;
 }
 
 // Virtual keyboard
@@ -653,13 +691,13 @@ function setInputChar(idx, ch) {
     if (idx < 0 || idx >= spellInputs.length) return;
     spellInputs[idx].char = ch.toLowerCase();
     spellInputs[idx].el.textContent = ch.toLowerCase();
-    spellInputs[idx].el.classList.add('filled');
+    spellInputs[idx].el.className = 'input-box filled';
 }
 
 function clearInputs() {
     spellInputs.forEach(function(s) {
         s.char = ''; s.el.textContent = '';
-        s.el.className = 'input-box';
+        s.el.className = 'input-box empty';
     });
     currentInputPos = 0;
 }
@@ -672,8 +710,13 @@ document.querySelectorAll('.kb-key').forEach(function(key) {
                 currentInputPos--;
                 spellInputs[currentInputPos].char = '';
                 spellInputs[currentInputPos].el.textContent = '';
-                spellInputs[currentInputPos].el.className = 'input-box';
+                spellInputs[currentInputPos].el.className = 'input-box empty';
             }
+        } else if (k === 'shift') {
+            // Toggle case for the keyboard display (visual only)
+            var keys = document.querySelectorAll('.kb-key:not(.special):not(.backspace-icon)');
+            var isUpper = keys[0] && keys[0].textContent === keys[0].textContent.toUpperCase() && /[a-z]/i.test(keys[0].textContent);
+            keys.forEach(function(k) { k.textContent = isUpper ? k.textContent.toLowerCase() : k.textContent.toUpperCase(); });
         } else if (k === 'enter') {
             checkSpelling();
         } else {
